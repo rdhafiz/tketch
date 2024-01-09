@@ -8,10 +8,10 @@ const authRouter = require("./routes/auth.route");
 // initialize express
 const app = express();
 app.use(cors());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-// Need to use all route of the app
+//all route of the app
 app.use(apiVersion+"/auth", authRouter);
 
 app.get('/', (req, res) => {
@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 });
 
 //handling server error
-app.use((err, req, res, next) => {
+app.use((req, res, next) => {
     res.status(500).json({
         message: "server error",
     });
