@@ -2,15 +2,17 @@ const express = require("express");
 const cors = require("cors");
 require("./config/db");
 const apiVersion = '/api/v0.1'
+// imported route goes here
+const authRouter = require("./routes/auth.route");
 
-const userRouter = require("./routes/auth.route");
-
+// initialize express
 const app = express();
-
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(apiVersion+"/user", userRouter);
+
+// Need to use all route of the app
+app.use(apiVersion+"/auth", authRouter);
 
 app.get('/', (req, res) => {
     res.send('Welcome to tketch server');
