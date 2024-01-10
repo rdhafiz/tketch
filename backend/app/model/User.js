@@ -1,21 +1,29 @@
 const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema({
-    first_name: {
+    name: {
         type: String,
-        reuired: [true, 'First Name field is required'],
-    },
-    last_name: {
-        type: String,
-        reuired: [true, 'Last Name field is required'],
+        required: true,
     },
     email: {
         type: String,
-        reuired: [true, 'Email field is required'],
+        required: true,
     },
     password: {
         type: String,
-        reuired: [true, 'Password field is required'],
+        required: true,
+    },
+    avatar: {
+        type: String,
+        default: null,
+    },
+    activation_code: {
+        type: String,
+        default: null,
+    },
+    reset_code: {
+        type: String,
+        default: null,
     },
     created_at: {
         type: Date,
