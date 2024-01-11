@@ -14,8 +14,8 @@ const login = async (req, res) => {
         // Defining the schema for request body validation using "Joi"
         const schema = Joi.object({
             email: Joi.string().email().required(),
-            password: Joi.string().min(6).required(),
-        });
+            password: Joi.string().required(),
+        }).options({abortEarly: false});
 
         // Validating the request body against the defined schema
         const validator = await schema.validate(req.body);
