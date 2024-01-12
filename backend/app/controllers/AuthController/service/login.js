@@ -43,7 +43,7 @@ const login = async (req, res) => {
                 html: message
             }
             MailService.sendMail(mailOptions);
-            return res.status(200).json({message: 'A verification mail has been sent to your email, Please verify the email to login'})
+            return res.status(200).json({message: 'A verification mail has been sent to your email, Please verify the email to login', status: 'email sent'})
         }
 
         // Comparing the provided password with the hashed password stored in the database

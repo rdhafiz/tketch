@@ -1,10 +1,28 @@
-import React from 'react';
-import {Link} from "react-router-dom";
+import React, {useState} from 'react';
+import {Link, useNavigate} from "react-router-dom";
+import ApiService from "../../services/ApiService.js";
+import ApiRoutes from "../../services/ApiRoutes.js";
 
-function FotgotPassword() {
+function ForgotPassword() {
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        ApiService.ClearErrorHandler()
+        let param = {
+            email: event.target.email.value,
+        }
+        setLoading(true);
+        ApiService.POST(ApiRoutes.forgotPassword, param, (res) => {
+            setLoading(false);
+            if (res.status === 'ok') {
+                navigate('/reset/password', {state: {message: res.message, email: param.email}})
+            }
+        })
+    }
     return (
         <>
-            <form className="rounded-lg border shadow-sm w-full max-w-md bg-white">
+            <form onSubmit={handleSubmit} className="rounded-lg border shadow-sm w-full max-w-md bg-white">
                 <div className="flex flex-col space-y-1.5 p-6">
                     <h3 className="font-semibold tracking-tight text-2xl text-center">Forgot Password</h3>
                     <p className="text-sm  text-center">
@@ -12,45 +30,14 @@ function FotgotPassword() {
                     </p>
                 </div>
                 <div className="p-6 space-y-4">
-                    <div className="space-y-2">
+                    <div className="space-y-2 form-input">
                         <label className="text-sm font-medium leading-none" htmlFor="email">Email</label>
-                        <input className="w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
-                               id="email" name="email" placeholder="m@example.com" required="" type="email"/>
+                        <input className="input" id="email" name="email" placeholder="m@example.com" required="" type="email"/>
+                        <small className="text-red-500 text-sm invalid-feedback"></small>
                     </div>
                 </div>
                 <div className="items-center p-6 pt-4 flex flex-col space-y-2">
-                    <button
-                        className="btn-black">Submit
-                    </button>
-                    <div className="flex items-center justify-center space-x-1">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Remember Password?</span>
-                        <Link to={`/`} className="text-sm text-cyan-500 dark:text-gray-400">Login</Link>
-                    </div>
-                </div>
-            </form>
-            <form className="rounded-lg border shadow-sm w-full max-w-md bg-white">
-                <div className="flex flex-col space-y-1.5 p-6">
-                    <h3 className="font-semibold tracking-tight text-2xl text-center">Reset Password</h3>
-                    <p className="text-sm  text-center">
-                        Enter your new password.
-                    </p>
-                </div>
-                <div className="p-6 space-y-4">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="password">Password</label>
-                        <input className="flex  w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
-                               id="password" name="password" required="" type="password"/>
-                    </div>
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="password">Confirm Password</label>
-                        <input className="flex  w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
-                               id="password" name="password" required="" type="password"/>
-                    </div>
-                </div>
-                <div className="items-center p-6 pt-4 flex flex-col space-y-2">
-                    <button
-                        className="btn-black">Submit
-                    </button>
+                    <button type={`submit`} className={`btn-black ${loading ? 'btn-loading' : ''}`}>Submit</button>
                     <div className="flex items-center justify-center space-x-1">
                         <span className="text-sm text-gray-500 dark:text-gray-400">Remember Password?</span>
                         <Link to={`/`} className="text-sm text-cyan-500 dark:text-gray-400">Login</Link>
@@ -62,4 +49,4 @@ function FotgotPassword() {
     );
 }
 
-export default FotgotPassword;
+export default ForgotPassword;

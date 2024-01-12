@@ -6,11 +6,15 @@ import ForgotPassword from "../app/auth/ForgotPassword.jsx";
 import Dashboard from "../app/dashboard/Dashboard.jsx";
 import RouteGuard from "../AuthGuard.jsx";
 import Layout from "../app/layout/Layout.jsx";
+import Verify from "../app/auth/Verify.jsx";
+import ErrorPage from "../app/notFound/notFound.jsx";
+import ResetPassword from "../app/auth/ResetPassword.jsx";
 export const router = createBrowserRouter(
     [
         {
             path:'/',
             element: <RouteGuard.Public> < AuthLayout/> </RouteGuard.Public>,
+            errorElement: <ErrorPage></ErrorPage>,
             children: [
                 {
                     path:'/',
@@ -21,8 +25,16 @@ export const router = createBrowserRouter(
                     element:<Register/>,
                 },
                 {
+                    path:'/verify/account',
+                    element:<Verify/>,
+                },
+                {
                     path:'/forgot/password',
                     element:<ForgotPassword/>,
+                },
+                {
+                    path:'/reset/password',
+                    element:<ResetPassword/>,
                 },
             ]
         },

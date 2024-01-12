@@ -11,7 +11,7 @@ const forgotPassword = async (req, res) => {
         // Defining the schema for request body validation using "Joi"
         const schema = Joi.object({
             email: Joi.string().email().required(),
-        });
+        }).options({abortEarly: false});
         // Validating the request body against the defined schema
         const validator = await schema.validate(req.body);
         // If validation fails, return a 400 Bad Request response with validation errors
@@ -39,7 +39,7 @@ const forgotPassword = async (req, res) => {
             html: message
         }
         MailService.sendMail(mailOptions);
-        return res.status(200).json({message: 'A reset code has been sent to your email'})
+        return res.status(200).json({message: 'A reset code has been sent to your email.', status: 'ok'})
     } catch (error) {
         res.status(500).send(error.message);
     }

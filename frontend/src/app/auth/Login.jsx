@@ -1,11 +1,14 @@
 import React, {useState} from 'react';
-import {Link} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import ApiService from "../../services/ApiService.js";
 import ApiRoutes from "../../services/ApiRoutes.js";
 import AuthService from "../../services/AuthService.js";
 
 function Login() {
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate()
+    const location = useLocation();
+    const {message} = location.state
     const handleSubmit = (event) => {
         event.preventDefault();
         ApiService.ClearErrorHandler()
@@ -15,10 +18,12 @@ function Login() {
         }
         setLoading(true);
         ApiService.POST(ApiRoutes.login, param, (res) => {
-            console.log(res)
             setLoading(false);
             if (res.status === 'ok') {
                 AuthService.setAuthentication(res.access_token, res.data);
+                navigate('/dashboard')
+            } else if (res.status === 'email sent') {
+                navigate("/verify/account", {state: {message: res.message, email: param.email}});
             }
         })
     }
@@ -30,6 +35,14 @@ function Login() {
                     Enter your email and password to login to your account.
                 </p>
             </div>
+            {message ? (
+                <div className="p-4 space-y-4">
+                    <div role="alert" className="alert info">
+                        {message}
+                    </div>
+                </div>
+            ) : ('')
+            }
             <div className="p-6 space-y-4">
                 <div className="space-y-2 form-input">
                     <label className="text-sm font-medium leading-none" htmlFor="email">Email</label>
