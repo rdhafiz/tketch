@@ -14,7 +14,7 @@ const register = async (req, res) => {
             email: Joi.string().email().required(),
             password: Joi.string().min(6).required(),
             confirm_password: Joi.string().valid(Joi.ref('password')).min(6).required(),
-        });
+        }).options({abortEarly: false});
         // Validating the request body against the defined schema
         const validator = await schema.validate(req.body);
         // If validation fails, return a 400 Bad Request response with validation errors

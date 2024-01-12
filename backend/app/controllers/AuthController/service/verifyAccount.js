@@ -11,7 +11,7 @@ const verifyAccount = async (req, res) => {
         const schema = Joi.object({
             code: Joi.string().required(),
             email: Joi.string().email().required(),
-        });
+        }).options({abortEarly: false});
         // Validating the request body against the defined schema
         const validator = await schema.validate(req.body);
         // If validation fails, return a 400 Bad Request response with validation errors

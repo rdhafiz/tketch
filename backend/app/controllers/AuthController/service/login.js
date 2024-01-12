@@ -14,8 +14,8 @@ const login = async (req, res) => {
         // Defining the schema for request body validation using "Joi"
         const schema = Joi.object({
             email: Joi.string().email().required(),
-            password: Joi.string().min(6).required(),
-        });
+            password: Joi.string().required(),
+        }).options({abortEarly: false});
 
         // Validating the request body against the defined schema
         const validator = await schema.validate(req.body);
@@ -43,7 +43,7 @@ const login = async (req, res) => {
                 html: message
             }
             MailService.sendMail(mailOptions);
-            return res.status(200).json({message: 'A verification mail has been sent to your email, Please verify the email to login'})
+            return res.status(200).json({message: 'A verification mail has been sent to your email, Please verify the email to login', status: 'email sent'})
         }
 
         // Comparing the provided password with the hashed password stored in the database

@@ -12,7 +12,7 @@ const resetPassword = async (req, res) => {
             email: Joi.string().email().required(),
             password: Joi.string().min(6).required(),
             confirm_password: Joi.string().valid(Joi.ref('password')).min(6).required(),
-        });
+        }).options({abortEarly: false});
         // Validating the request body against the defined schema
         const validator = await schema.validate(req.body);
         // If validation fails, return a 400 Bad Request response with validation errors
@@ -23,7 +23,7 @@ const resetPassword = async (req, res) => {
         const user = await UserModel.findOne({ email, reset_code: code });
         // If no user is found, return a 400 Bad Request response indicating invalid credentials
         if (user == null) {
-            return res.status(400).json({ code: "No user found." });
+            return res.status(400).json({ code: "Reset code does not match." });
         }
         const salt = await bcrypt.genSalt();
         const hashPassword = await bcrypt.hash(password, salt);
@@ -31,7 +31,7 @@ const resetPassword = async (req, res) => {
         user.password = hashPassword;
         await user.save();
         // Returning a 200 OK response with message
-        res.status(200).json({ message: 'Password reset successfully', status: 'ok' });
+        res.status(200).json({ message: 'Password has been reset successfully, Login with your new password', status: 'ok' });
     } catch (error) {
         res.status(500).send(error.message);
     }
