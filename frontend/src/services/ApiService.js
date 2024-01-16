@@ -3,7 +3,7 @@ import AuthService from "./AuthService";
 
 let headers = {
     'Content-Type': 'application/json; charset=utf-8',
-    'X-Authorization': AuthService.getAccessToken() ?? ''
+    'authorization': AuthService.getAccessToken() ?? ''
 };
 const ApiService = {
 
@@ -58,7 +58,7 @@ const ApiService = {
         axios.post(url, param, {
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
-                'X-Authorization': AuthService.getAccessToken()
+                'authorization': AuthService.getAccessToken()
             },
             responseType: 'blob' }).then((response) => {
             if (response.status === 200) {
