@@ -8,7 +8,7 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate()
     const location = useLocation();
-    const {message} = location.state
+    const message = location?.state?.message
     const handleSubmit = (event) => {
         event.preventDefault();
         ApiService.ClearErrorHandler()

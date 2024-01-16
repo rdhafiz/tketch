@@ -1,7 +1,6 @@
 // Importing the database configuration from the 'db.js' file located in the 'config' folder
 require("./config/db");
 
-
 // Importing the 'express' module for building the web application
 const express = require("express");
 // Creating an instance of the Express application
