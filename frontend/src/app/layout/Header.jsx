@@ -1,13 +1,40 @@
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import Dropdown from "../components/Dropdown.jsx";
+import useClickOutside from "../../hooks/clickOutside.jsx";
+import useStore from "../../store/store.js";
+import TwoLatterName from "../components/TwoLatterName.jsx";
+import AuthService from "../../services/AuthService.js";
+import { AiOutlineUser } from "react-icons/ai";
+import { AiOutlineLogout } from "react-icons/ai";
 
 const Header = () => {
+    const {user} = useStore()
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const wrapperRef = useRef("");
+    const dropDownOptions = [
+        {name: 'Profile', isLink: true, link: '/dashboard/profile', icon: <AiOutlineUser/> },
+        {name: 'Logout', isLink: false, action: () => {AuthService.logout()}, icon: <AiOutlineLogout/>}
+    ]
+    useClickOutside(wrapperRef, () => {
+        setIsDropdownOpen(false);
+    });
+    const handleDropDown = () => {
+        setIsDropdownOpen(!isDropdownOpen)
+    }
+    useEffect(() => {
+    }, [user])
     return (
         <header className="flex items-center justify-between h-16 px-4 bg-gray-800 text-white">
             <div className="flex items-center space-x-4">
                 <span className="text-lg font-semibold">Tketch</span></div>
-            <span className="relative flex shrink-0 overflow-hidden rounded-full h-9 w-9" type="button"
-                  id="radix-:rk:" aria-haspopup="menu" aria-expanded="false" data-state="closed"><span
-                className="flex h-full w-full items-center justify-center rounded-full bg-muted">JP</span></span>
+            <span className="relative flex shrink-0 rounded-full h-9 w-9 overflow-visible " ref={wrapperRef} >
+                 {user.avatarFullPath ? (
+                     <img src={user.avatarFullPath} onClick={() => handleDropDown() } alt=""/>
+                 ) : (
+                     <span className="flex h-full w-full items-center justify-center rounded-full bg-cyan-500" onClick={() => handleDropDown() }><TwoLatterName name={user.name}/></span>
+                 )}
+                 <Dropdown handleDropDown={handleDropDown} isOpen={isDropdownOpen} options={dropDownOptions}/>
+            </span>
         </header>
     );
 };

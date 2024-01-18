@@ -6,12 +6,16 @@ const express = require("express");
 // Creating an instance of the Express application
 const app = express();
 
+app.use('/uploads', express.static('./uploads'));
 
 // Importing the 'cors' module for enabling Cross-Origin Resource Sharing
 const cors = require("cors");
 // Enabling Cross-Origin Resource Sharing for all routes
 app.use(cors());
 
+// Importing express file upload package
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
 
 // Parsing incoming requests with URL-encoded payloads
 app.use(express.urlencoded({ extended: true }));

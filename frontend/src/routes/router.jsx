@@ -9,6 +9,7 @@ import Layout from "../app/layout/Layout.jsx";
 import Verify from "../app/auth/Verify.jsx";
 import ErrorPage from "../app/notFound/notFound.jsx";
 import ResetPassword from "../app/auth/ResetPassword.jsx";
+import Profile from "../app/Profile/Profile.jsx";
 export const router = createBrowserRouter(
     [
         {
@@ -41,10 +42,15 @@ export const router = createBrowserRouter(
         {
             path:'/dashboard',
             element: <RouteGuard.Protected> < Layout/> </RouteGuard.Protected>,
+            errorElement: <ErrorPage></ErrorPage>,
             children: [
                 {
                     path:'/dashboard',
                     element:<Dashboard/>,
+                },
+                {
+                    path:'/dashboard/profile',
+                    element:<Profile/>,
                 },
             ]
         },

@@ -4,7 +4,7 @@ const LabelModel = require("../../../model/Label");
 
 const create = async (req, res) => {
     try {
-        // get value from request body
+        // get session user from request body
         const { sessionUser } = req
         const { name, project_id, color, description } = req.body
         // Defining the schema for request body validation using "Joi"
@@ -13,9 +13,6 @@ const create = async (req, res) => {
             project_id: Joi.string().required(),
             color: Joi.string().required(),
             description: Joi.string().allow(null),
-            // icon: Joi.object({
-            //     mimetype: Joi.string().valid('image/jpeg', 'image/png', 'application/pdf').required(),
-            // }).required(),
         }).options({abortEarly: false});
         // Validating the request body against the defined schema
         const validator = await schema.validate(req.body);
