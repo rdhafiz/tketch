@@ -2,6 +2,8 @@ import React from 'react';
 import {Outlet} from "react-router-dom";
 import Header from "./Header.jsx";
 import Sidenav from "./Sidenav.jsx";
+import {ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 function Layout() {
     return (
@@ -13,6 +15,7 @@ function Layout() {
                     <Outlet />
                 </main>
             </div>
+            <ToastContainer />
         </div>
     );
 }

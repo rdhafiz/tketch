@@ -20,7 +20,7 @@ function Register() {
         ApiService.POST(ApiRoutes.register, param, (res) => {
             setLoading(false);
             if (res.status === 'ok') {
-                navigate("/verify/account/" + param.email, {state: {message: res.message}});
+                navigate("/verify/account", {state: {message: res.message, email: param.email}});
             }
         })
     }

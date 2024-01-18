@@ -3,11 +3,11 @@ import AuthService from "./AuthService";
 
 let headers = {
     'Content-Type': 'application/json; charset=utf-8',
-    'authorization': AuthService.getAccessToken() ?? ''
 };
 const ApiService = {
 
     POST: function (url, param, callback)  {
+        headers['authorization'] = AuthService.getAccessToken(false)
         axios.post(url, param, {headers: headers}).then((response) => {
             if (response.status === 200 || response.status === 201) {
                 callback(response.data);
@@ -22,7 +22,24 @@ const ApiService = {
             }
         })
     },
+    PATCH: function (url, param, callback)  {
+        headers['authorization'] = AuthService.getAccessToken(false)
+        axios.patch(url, param, {headers: headers}).then((response) => {
+            if (response.status === 200 || response.status === 201) {
+                callback(response.data);
+            }
+        }).catch(err => {
+            if (err) {
+                callback(err?.response?.status)
+                this.ErrorHandler(err?.response?.data)
+                if (err.response.status === 401) {
+                    AuthService.logout()
+                }
+            }
+        })
+    },
     POST_FORMDATA: function (url, param, callback) {
+        headers['authorization'] = AuthService.getAccessToken(false)
         headers['Content-Type'] = 'multipart/form-data';
         axios.post(url, param, {headers: headers}).then((response) => {
             if (response.status === 200) {
@@ -38,7 +55,25 @@ const ApiService = {
             }
         })
     },
+    PATCH_FORMDATA: function (url, param, callback) {
+        headers['authorization'] = AuthService.getAccessToken(false)
+        headers['Content-Type'] = 'multipart/form-data';
+        axios.patch(url, param, {headers: headers}).then((response) => {
+            if (response.status === 200) {
+                callback(response.data);
+            }
+        }).catch(err => {
+            if (err) {
+                callback(err?.response?.status)
+                this.ErrorHandler(err?.response?.data)
+                if (err.response.status === 401) {
+                    AuthService.logout()
+                }
+            }
+        })
+    },
     GET: function (url, callback)  {
+        headers['authorization'] = AuthService.getAccessToken(false)
         axios.get(url, {headers: headers}).then((response) => {
             if (response.status === 200) {
                 callback(response.data);
@@ -58,7 +93,7 @@ const ApiService = {
         axios.post(url, param, {
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
-                'authorization': AuthService.getAccessToken()
+                'authorization': AuthService.getAccessToken(false)
             },
             responseType: 'blob' }).then((response) => {
             if (response.status === 200) {

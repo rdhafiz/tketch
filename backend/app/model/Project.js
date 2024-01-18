@@ -1,9 +1,6 @@
 const mongoose = require("mongoose");
 const {array} = require("joi");
 
-const memberSchema = new mongoose.Schema({
-    user_id: { type: ObjectId, required: true },
-});
 
 const projectSchema = mongoose.Schema({
     name: {
@@ -11,11 +8,11 @@ const projectSchema = mongoose.Schema({
         required: true,
     },
     creator_id: {
-        type: ObjectId,
+        type: String,
         required: true
     },
     member_id: {
-      type: memberSchema,
+      type: [String],
       required: true
     },
     icon: {
