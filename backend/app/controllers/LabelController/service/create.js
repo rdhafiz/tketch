@@ -27,14 +27,13 @@ const create = async (req, res) => {
             return res.status(400).json({ name: "Label already exist with this name." });
         }
         //create a new label
-        const label = await LabelModel.create({
+        await LabelModel.create({
             name: name,
             project_id: project_id,
             color: color,
             description: description,
             creator_id: sessionUser._id,
-        })
-        await label.save();
+        });
         return res.status(201).json({message: 'Label has been created successfully.', status: 'ok'})
     } catch (error) {
         res.status(500).send(error.message);

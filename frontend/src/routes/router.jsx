@@ -9,7 +9,11 @@ import Layout from "../app/layout/Layout.jsx";
 import Verify from "../app/auth/Verify.jsx";
 import ErrorPage from "../app/notFound/notFound.jsx";
 import ResetPassword from "../app/auth/ResetPassword.jsx";
-import Profile from "../app/Profile/Profile.jsx";
+import Profile from "../app/profile/Profile.jsx";
+import AddProject from "../app/project/AddProject.jsx";
+import EditProject from "../app/project/EditProject.jsx";
+import ApiService from "../services/ApiService.js";
+import ApiRoutes from "../services/ApiRoutes.js";
 export const router = createBrowserRouter(
     [
         {
@@ -51,6 +55,14 @@ export const router = createBrowserRouter(
                 {
                     path:'/dashboard/profile',
                     element:<Profile/>,
+                },
+                {
+                    path:'/dashboard/project/create',
+                    element:<AddProject/>,
+                },
+                {
+                    path:'/dashboard/project/:id',
+                    element:<EditProject/>,
                 },
             ]
         },

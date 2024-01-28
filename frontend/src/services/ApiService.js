@@ -42,7 +42,7 @@ const ApiService = {
         headers['authorization'] = AuthService.getAccessToken(false)
         headers['Content-Type'] = 'multipart/form-data';
         axios.post(url, param, {headers: headers}).then((response) => {
-            if (response.status === 200) {
+            if (response.status === 200 || response.status === 201) {
                 callback(response.data);
             }
         }).catch(err => {
@@ -75,6 +75,22 @@ const ApiService = {
     GET: function (url, callback)  {
         headers['authorization'] = AuthService.getAccessToken(false)
         axios.get(url, {headers: headers}).then((response) => {
+            if (response.status === 200) {
+                callback(response.data);
+            }
+        }).catch(err => {
+            if (err) {
+                callback(err?.response?.status)
+                this.ErrorHandler(err?.response?.data)
+                if (err.response.status === 401) {
+                    AuthService.logout()
+                }
+            }
+        })
+    },
+    DELETE: function (url, callback)  {
+        headers['authorization'] = AuthService.getAccessToken(false)
+        axios.delete(url, {headers: headers}).then((response) => {
             if (response.status === 200) {
                 callback(response.data);
             }

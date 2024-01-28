@@ -39,6 +39,7 @@ const create = async (req, res) => {
         label.name = name;
         label.color = color;
         label.description = description;
+        label.update_at = Date.now();
         await label.save();
         return res.status(201).json({message: 'Label has been updated successfully.', status: 'ok'})
     } catch (error) {

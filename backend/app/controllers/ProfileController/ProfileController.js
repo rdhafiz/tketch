@@ -25,7 +25,7 @@ const ProfileController = {
      * @desc updatePassword function called by route to update password of session user
      * @param {Object} req - request object
      * @param {Object} res - response object
-     * @access - public
+     * @access - private
      */
     updatePassword: async (req, res) => {
         await updatePassword(req, res);

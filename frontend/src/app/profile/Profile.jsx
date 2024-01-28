@@ -7,7 +7,7 @@ import {toast} from "react-toastify";
 import useStore from "../../store/store.js";
 
 const Profile = () => {
-    const {user, setUser} = useStore()
+    const {user, setUser} = useStore();
     const [profile, setProfile] = useState(user)
     const [loading, setLoading] = useState({profile: false, password: false})
     const handleChangeImage = (e) => {
@@ -73,7 +73,7 @@ const Profile = () => {
                                 {profile.avatarFullPath ? (
                                     <img src={profile.avatarFullPath} alt=""/>
                                 ) : (
-                                    <span className="flex h-full w-full items-center justify-center rounded-full bg-cyan-500">
+                                    <span className={`flex h-full w-full items-center justify-center rounded-full ${user.color}`}>
                                         <TwoLatterName name={profile.name}/>
                                     </span>
                                 )}

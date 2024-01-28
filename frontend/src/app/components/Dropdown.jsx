@@ -19,7 +19,7 @@ function Dropdown({isOpen, options, handleDropDown}) {
     return (
         <div>
             {isOpen && (
-                <ul style={{left: `-${position.left}px`,}} className="absolute top-full min-w-[200px] bg-white border border-slate-200 p-1 rounded-lg shadow-xl" ref={dropDownRef}>
+                <ul style={{left: `-${position.left}px`,}} className="absolute z-10 top-full min-w-[200px] bg-white border border-slate-200 p-1 rounded-lg shadow-xl" ref={dropDownRef}>
                     {options.map((option, index) => {
                         return (
                             <li className={`border-b last:border-0`} key={index}>

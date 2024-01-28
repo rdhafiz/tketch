@@ -3,7 +3,7 @@ const Validator = require("../../../helpers/validator");
 const UserModel = require("../../../model/User");
 const UserService = require("../../../service/UserService");
 const fs = require('fs-extra')
-const path = require("path")
+const HandleUpload = require("../../../helpers/handleUpload");
 const update = async (req, res) => {
     try {
         // get value from request body
@@ -32,22 +32,17 @@ const update = async (req, res) => {
         }
         //process file upload
         if (req.files) {
-            const avatar = req.files.avatar;
             const supportedMine = ['image/jpeg', 'image/png', 'image/jpg']
-            if (!supportedMine.includes(avatar.mimetype)) {
+            if (!supportedMine.includes(req.files.avatar.mimetype)) {
                 return res.status(400).json({ avatar: "File format not supported. Only support jpeg, jpg, png" });
             }
-            const fileExt = path.extname(avatar.name)
-            const fileNewName = avatar.name.replace(fileExt, '').toLowerCase().split(' ').join('-') + '-' + Date.now();
-            const fileName = fileNewName + fileExt;
-            const uploadPath = './uploads/' + fileName;
-            await avatar.mv(uploadPath)
+            let fileName = await HandleUpload.uploadFile(req.files.avatar)
             fs.remove('./uploads/' + user.avatar)
             user.avatar = fileName
         }
         user.name = name;
         await user.save();
-        res.status(200).json({ data: UserService.parseData(user), message: 'Profile has been updated successfully', status: 'ok'});
+        res.status(200).json({ data: UserService.parseData(user), message: 'profile has been updated successfully', status: 'ok'});
     } catch (error) {
         res.status(500).send(error.message);
     }

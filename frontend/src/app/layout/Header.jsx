@@ -6,9 +6,10 @@ import TwoLatterName from "../components/TwoLatterName.jsx";
 import AuthService from "../../services/AuthService.js";
 import { AiOutlineUser } from "react-icons/ai";
 import { AiOutlineLogout } from "react-icons/ai";
+import {Link} from "react-router-dom";
 
 const Header = () => {
-    const {user} = useStore()
+    const {user} = useStore();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const wrapperRef = useRef("");
     const dropDownOptions = [
@@ -21,21 +22,23 @@ const Header = () => {
     const handleDropDown = () => {
         setIsDropdownOpen(!isDropdownOpen)
     }
-    useEffect(() => {
-    }, [user])
     return (
-        <header className="flex items-center justify-between h-16 px-4 bg-gray-800 text-white">
-            <div className="flex items-center space-x-4">
-                <span className="text-lg font-semibold">Tketch</span></div>
-            <span className="relative flex shrink-0 rounded-full h-9 w-9 overflow-visible " ref={wrapperRef} >
-                 {user.avatarFullPath ? (
-                     <img src={user.avatarFullPath} onClick={() => handleDropDown() } alt=""/>
+        <>
+            {user && (
+                <header className="flex items-center justify-between h-16 px-4 bg-gray-800 text-white">
+                    <div className="flex items-center space-x-4">
+                        <Link to={`/dashboard`} className="text-lg font-semibold">Tketch</Link></div>
+                    <span className="relative flex shrink-0 rounded-full h-9 w-9 overflow-visible " ref={wrapperRef} >
+                 {user?.avatarFullPath ? (
+                     <img className={`cursor-pointer`} src={user.avatarFullPath} onClick={() => handleDropDown() } alt=""/>
                  ) : (
-                     <span className="flex h-full w-full items-center justify-center rounded-full bg-cyan-500" onClick={() => handleDropDown() }><TwoLatterName name={user.name}/></span>
+                     <span className={`cursor-pointer flex h-full w-full items-center justify-center rounded-full ${user?.color}`} onClick={() => handleDropDown() }><TwoLatterName name={user.name}/></span>
                  )}
-                 <Dropdown handleDropDown={handleDropDown} isOpen={isDropdownOpen} options={dropDownOptions}/>
+                        <Dropdown handleDropDown={handleDropDown} isOpen={isDropdownOpen} options={dropDownOptions}/>
             </span>
-        </header>
+                </header>
+            )}
+        </>
     );
 };
 
