@@ -6,9 +6,13 @@ const ApiRoutes = {
     verify: baseUrl + '/auth/verify',
     forgotPassword: baseUrl + '/auth/forgot/password',
     resetPassword: baseUrl + '/auth/reset/password',
-    //profile
+    // profile
     profile: baseUrl + '/profile',
-    passwordUpdate: baseUrl + '/profile/password/update'
+    passwordUpdate: baseUrl + '/profile/password/update',
+    // users
+    user: baseUrl + '/user',
+    // project
+    project: baseUrl + '/project'
 
 };
 export default ApiRoutes;

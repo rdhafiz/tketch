@@ -13,6 +13,7 @@ const UserService = {
             avatarFullPath: avatarFullPath(user.avatar),
             name: user.name,
             email: user.email,
+            color: user.color,
         }
     },
 }

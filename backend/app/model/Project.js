@@ -1,26 +1,28 @@
 const mongoose = require("mongoose");
-const {array} = require("joi");
-
 
 const projectSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
     },
+    description: {
+        type: String,
+    },
     creator_id: {
         type: String,
         required: true
     },
-    member_id: {
+    members_id: {
       type: [String],
       required: true
     },
     icon: {
         type: String,
+        default: null
     },
     status: {
         type: String,
-        default: 'Active'
+        default: 'active'
     },
     deleted_at: {
         type: Date,

@@ -4,6 +4,7 @@ const UserModel = require("../../../model/User");
 const bcrypt = require("bcrypt");
 const MailTemplate = require("../../../service/MailTemplateService");
 const MailService = require("../../../service/MailService");
+const randomColor = require("../../../helpers/generateRandomColor")
 const register = async (req, res) => {
     try {
         // get value from request body
@@ -34,6 +35,7 @@ const register = async (req, res) => {
         const user = await UserModel.create({
             name,
             email,
+            color: randomColor(),
             password: hashPassword,
             activation_code: activationCode,
         })

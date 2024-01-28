@@ -13,6 +13,10 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    color: {
+        type: String,
+        default: null,
+    },
     avatar: {
         type: String,
         default: null,

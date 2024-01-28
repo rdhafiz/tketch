@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-const TwoLatterName = ({name}) => {
+const TwoLatterName = ({name, classes = 'font-bold'}) => {
     const [showName, setShowName] = useState('')
     useEffect(() => {
         let nameArray = name.split(' ')
@@ -11,7 +11,7 @@ const TwoLatterName = ({name}) => {
         }
     }, [name])
     return (
-        <span className="uppercase text-2xl font-bold text-white">
+        <span className={`uppercase text-white ${classes}`}>
             {showName}
         </span>
     );

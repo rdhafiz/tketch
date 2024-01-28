@@ -3,9 +3,11 @@ import {Link, useLocation, useNavigate} from "react-router-dom";
 import ApiService from "../../services/ApiService.js";
 import ApiRoutes from "../../services/ApiRoutes.js";
 import AuthService from "../../services/AuthService.js";
+import useStore from "../../store/store.js";
 
 
 function Verify() {
+    const { setUser } = useStore();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -22,6 +24,7 @@ function Verify() {
             setLoading(false);
             if (res.status === 'ok') {
                 AuthService.setAuthentication(res.access_token, res.data);
+                setUser(res.data);
                 navigate('/dashboard')
             }
         })
