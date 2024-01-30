@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import ApiService from "../../services/ApiService.js";
 import ApiRoutes from "../../services/ApiRoutes.js";
 import AuthService from "../../services/AuthService.js";
-import TwoLatterName from "../components/TwoLatterName.jsx";
+import TwoLetterName from "../components/TwoLetterName.jsx";
 import {toast} from "react-toastify";
 import useStore from "../../store/store.js";
 
@@ -74,7 +74,7 @@ const Profile = () => {
                                     <img src={profile.avatarFullPath} alt=""/>
                                 ) : (
                                     <span className={`flex h-full w-full items-center justify-center rounded-full ${user.color}`}>
-                                        <TwoLatterName name={profile.name}/>
+                                        <TwoLetterName name={profile.name}/>
                                     </span>
                                 )}
 

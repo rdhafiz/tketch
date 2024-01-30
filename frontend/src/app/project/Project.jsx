@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Link} from "react-router-dom";
 import ApiService from "../../services/ApiService.js";
 import ApiRoutes from "../../services/ApiRoutes.js";
-import TwoLatterName from "../components/TwoLatterName.jsx";
+import TwoLetterName from "../components/TwoLetterName.jsx";
 import {BiArchive, BiTrash, BiEditAlt, BiRotateLeft, BiChevronRight, BiChevronLeft} from "react-icons/bi";
 import Popup from "reactjs-popup";
 import NoDataFound from "../components/NoDataFound.jsx";
@@ -14,6 +14,7 @@ const Project = () => {
     const {setProject, user} = useStore();
     const popupRef = useRef();
     const [projects, setProjects] = useState([])
+    const [status, setStatus] = useState([])
     const [loading, setLoading] = useState(true)
     const [loadingAction, setLoadingAction] = useState(false)
     const [componentMounted, setComponentMounted] = useState(false);
@@ -50,6 +51,11 @@ const Project = () => {
             }
         })
     }
+    const getStatus = () => {
+        ApiService.GET(ApiRoutes.project+'/status', (res) => {
+            setStatus(res.data)
+        })
+    }
     const filterStatus = (e) => {
         setFilter((prevVal) => ({
             ...prevVal,
@@ -74,6 +80,7 @@ const Project = () => {
     useEffect(() => {
         if (!componentMounted) {
             getProjects();
+            getStatus();
             setComponentMounted(true);
         }
     }, [componentMounted])
@@ -122,9 +129,12 @@ const Project = () => {
                         <option value="my">My Projects</option>
                         <option value="shared">Shared Projects</option>
                     </select>
-                    <select className={`input min-w-64 `} onChange={filterStatus}>
-                        <option value="active">Active</option>
-                        <option value="archive">Archive</option>
+                    <select className={`input min-w-64 capitalize`} onChange={filterStatus}>
+                        {status.map(s => {
+                            return (
+                                <option className={`capitalize`} key={s.value} value={s.value}>{s.name}</option>
+                            )
+                        })}
                     </select>
                 </div>
 
@@ -146,7 +156,7 @@ const Project = () => {
                                     <div className="rounded-lg shadow bg-gray-100 mb-3" key={project._id}>
                                         <div className="space-y-4 divide-y pb-3">
                                             <div className="flex px-4 pt-3 items-center">
-                                                <Link to={`/dashboard`}
+                                                <Link to={`/dashboard/project/${project._id}/task`}
                                                       className="flex cursor-pointer items-center leading-5 text-gray-700 transition duration-150 ease-in-out">
                                                     {project.iconFullPath ? (
                                                         <span className="block h-9 w-9 flex-shrink-0 rounded-md">
@@ -154,7 +164,7 @@ const Project = () => {
                                                          </span>
                                                     ) : (
                                                         <span className={`flex items-center justify-center h-9 w-9 flex-shrink-0 rounded-md bg-cyan-500`}>
-                                                            <TwoLatterName classes={`font-normal`} name={project.name}/>
+                                                            <TwoLetterName classes={`font-normal`} name={project.name}/>
                                                         </span>
                                                     )}
                                                     <div className="truncate text-gray-500 ms-4">
@@ -168,7 +178,7 @@ const Project = () => {
                                                                         </div>
                                                                     ) : (
                                                                         <span className={`flex items-center justify-center h-4 w-4 flex-shrink-0 rounded-full ${project.user.color}`}>
-                                                                            <TwoLatterName classes={`font-normal text-[10px]`} name={project.user.name}/>
+                                                                            <TwoLetterName classes={`font-normal text-[10px]`} name={project.user.name}/>
                                                                         </span>
                                                                     )
                                                                 }

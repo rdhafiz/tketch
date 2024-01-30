@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import Dropdown from "../components/Dropdown.jsx";
 import useClickOutside from "../../hooks/clickOutside.jsx";
 import useStore from "../../store/store.js";
-import TwoLatterName from "../components/TwoLatterName.jsx";
+import TwoLetterName from "../components/TwoLetterName.jsx";
 import AuthService from "../../services/AuthService.js";
 import { AiOutlineUser } from "react-icons/ai";
 import { AiOutlineLogout } from "react-icons/ai";
@@ -27,12 +27,12 @@ const Header = () => {
             {user && (
                 <header className="flex items-center justify-between h-16 px-4 bg-gray-800 text-white">
                     <div className="flex items-center space-x-4">
-                        <Link to={`/dashboard`} className="text-lg font-semibold">Tketch</Link></div>
+                        <Link to={`/dashboard`} className="text-3xl font-semibold">tketch</Link></div>
                     <span className="relative flex shrink-0 rounded-full h-9 w-9 overflow-visible " ref={wrapperRef} >
                  {user?.avatarFullPath ? (
                      <img className={`cursor-pointer`} src={user.avatarFullPath} onClick={() => handleDropDown() } alt=""/>
                  ) : (
-                     <span className={`cursor-pointer flex h-full w-full items-center justify-center rounded-full ${user?.color}`} onClick={() => handleDropDown() }><TwoLatterName name={user.name}/></span>
+                     <span className={`cursor-pointer flex h-full w-full items-center justify-center rounded-full ${user?.color}`} onClick={() => handleDropDown() }><TwoLetterName name={user.name}/></span>
                  )}
                         <Dropdown handleDropDown={handleDropDown} isOpen={isDropdownOpen} options={dropDownOptions}/>
             </span>

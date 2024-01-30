@@ -1,5 +1,5 @@
 const ProjectModel = require("../../../model/Project");
-const deleteLabel = async (req, res) => {
+const deleteProject = async (req, res) => {
     try {
         const {id} = req.params
         const project = await ProjectModel.updateOne({_id: id}, {deleted_at: Date.now()}).exec()
@@ -12,4 +12,4 @@ const deleteLabel = async (req, res) => {
         res.status(500).send(error.message);
     }
 }
-module.exports = deleteLabel
+module.exports = deleteProject

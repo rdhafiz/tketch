@@ -5,10 +5,10 @@ const ProjectController = require('../app/controllers/ProjectController/ProjectC
 
 router.post("/", ProjectController.create);
 router.get("/", ProjectController.get);
+router.get("/status", ProjectController.getStatus);
+router.get("/:id", ProjectController.getSingle);
 router.patch("/:id", ProjectController.update);
 router.patch("/:id/update/status", ProjectController.updateStatus);
-router.patch("/:id/add/member", ProjectController.addMember);
-router.patch("/:id/remove/member", ProjectController.removeMember);
 router.delete("/:id", ProjectController.delete);
 
 module.exports = router;

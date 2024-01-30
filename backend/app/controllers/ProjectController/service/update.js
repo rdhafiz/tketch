@@ -4,7 +4,7 @@ const HandleUpload = require("../../../helpers/handleUpload");
 const ProjectModel = require("../../../model/Project");
 const fs = require("fs-extra");
 
-const create = async (req, res) => {
+const update = async (req, res) => {
     try {
         const {id} = req.params
         const {name, description, members_id } = req.body
@@ -44,4 +44,4 @@ const create = async (req, res) => {
     }
 }
 
-module.exports = create
+module.exports = update

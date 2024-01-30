@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-const TwoLatterName = ({name, classes = 'font-bold'}) => {
+const TwoLetterName = ({name, classes = 'font-bold'}) => {
     const [showName, setShowName] = useState('')
     useEffect(() => {
         let nameArray = name.split(' ')
@@ -17,4 +17,4 @@ const TwoLatterName = ({name, classes = 'font-bold'}) => {
     );
 };
 
-export default TwoLatterName;
+export default TwoLetterName;

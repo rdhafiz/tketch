@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import TwoLatterName from "../components/TwoLatterName.jsx";
+import TwoLetterName from "../components/TwoLetterName.jsx";
 import AsyncSelect from 'react-select/async'
 import {Link, useNavigate} from "react-router-dom";
 import ApiService from "../../services/ApiService.js";
@@ -25,7 +25,7 @@ const AddProject = () => {
                          <img src={user.avatarFullPath} onClick={() => handleDropDown()} alt=""/>
                      ) : (
                          <span
-                             className="flex h-full w-full items-center justify-center rounded-full bg-cyan-500"><TwoLatterName
+                             className="flex h-full w-full items-center justify-center rounded-full bg-cyan-500"><TwoLetterName
                              name={user.name} classes={``}/></span>
                      )}
                 </span>

@@ -12,7 +12,9 @@ const ApiRoutes = {
     // users
     user: baseUrl + '/user',
     // project
-    project: baseUrl + '/project'
+    project: baseUrl + '/project',
+    // task
+    task: baseUrl + '/task'
 
 };
 export default ApiRoutes;

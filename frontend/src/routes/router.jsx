@@ -14,6 +14,7 @@ import AddProject from "../app/project/AddProject.jsx";
 import EditProject from "../app/project/EditProject.jsx";
 import ApiService from "../services/ApiService.js";
 import ApiRoutes from "../services/ApiRoutes.js";
+import Task from "../app/task/Task.jsx";
 export const router = createBrowserRouter(
     [
         {
@@ -63,6 +64,10 @@ export const router = createBrowserRouter(
                 {
                     path:'/dashboard/project/:id',
                     element:<EditProject/>,
+                },
+                {
+                    path:'/dashboard/project/:id/task',
+                    element:<Task/>,
                 },
             ]
         },
