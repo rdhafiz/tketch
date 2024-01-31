@@ -36,16 +36,16 @@ const Task = () => {
             setLoading(false)
             if (res.status === 'ok') {
                 setProject(res.data)
-                // getTasks()
+                getTasks()
             }
         })
     }
     const getTasks = () => {
         setLoading(true)
-        ApiService.GET(ApiRoutes.task + '/' + id, (res) => {
+        ApiService.GET(ApiRoutes.task+ '/' + id, (res) => {
             setLoading(false)
             if (res.status === 'ok') {
-                setProject(res.data.project)
+                setTasks(res.data.task)
             }
         })
     }
@@ -66,6 +66,19 @@ const Task = () => {
     };
     const startItemIndex = (parseInt(filter.page) - 1) * parseInt(filter.limit) + 1;
     const endItemIndex = Math.min(parseInt(filter.page) * parseInt(filter.limit), parseInt(pageInfo.totalData));
+    const handleSubmitTask = (e) => {
+        e.preventDefault()
+        setLoadingAction(true);
+        let requestData = {
+            name: e.target.name.value,
+        }
+        ApiService.POST(ApiRoutes.task+'/'+id, requestData, (res) => {
+            setLoadingAction(false);
+            if (res.status === 'ok') {
+                getTasks()
+            }
+        })
+    }
     useEffect(() => {
         getProject()
     }, [location])
@@ -149,7 +162,29 @@ const Task = () => {
                                        ...prevVal,
                                        keyword: event.target.value
                                    }))}/>
-                            <Link to={`/dashboard/project/create`} className="btn-black">New Task</Link>
+                            <Popup offsetX={15} ref={popupRef}  trigger={<button className="btn-black">New Task</button>} position="bottom right">
+                                {close => (
+                                    <div className={`px-2 py-2 max-w-72`}>
+                                        <form onSubmit={handleSubmitTask}>
+                                            <div className="space-y-2 form-input">
+                                                <label className="text-sm font-medium leading-none" htmlFor="name">
+                                                    What's need to be done?
+                                                </label>
+                                                <input className="input" id="name" name={`name`}
+                                                />
+                                                <small className="text-red-500 text-sm invalid-feedback"></small>
+                                            </div>
+                                            <div className={`flex justify-end items-center mt-3`}>
+                                                <button type={`button`}
+                                                    className={`btn-white btn-sm me-2 min-w-12 justify-center`}
+                                                    onClick={close}>Close
+                                                </button>
+                                                <button type={`submit`} className={`btn-black btn-sm max-w-12 ${loadingAction ? 'btn-loading' : ''}`} onClick={() => manageStatus(task._id)}>Save</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                )}
+                            </Popup>
                         </div>
                     </div>
                     {tasks.length > 0 && !loading ? (

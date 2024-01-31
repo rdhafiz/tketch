@@ -1,5 +1,7 @@
 const baseUrl = 'http://localhost:4000'
 const ApiRoutes = {
+    // base
+    base: baseUrl + '/',
     // auth
     login: baseUrl + '/auth/login',
     register: baseUrl + '/auth/register',

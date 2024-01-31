@@ -58,7 +58,7 @@ const AddProject = () => {
     useEffect(() => {
         getUser();
     }, [])
-    const handleSubmitProfile = (e) => {
+    const handleSubmitProject = (e) => {
         e.preventDefault()
         setLoading(true);
         let formData = new FormData();
@@ -89,7 +89,7 @@ const AddProject = () => {
     }
     return (
         <div className={`w-full max-w-2xl mx-auto`}>
-            <form onSubmit={handleSubmitProfile} className="rounded-lg border shadow-sm mb-8">
+            <form onSubmit={handleSubmitProject} className="rounded-lg border shadow-sm mb-8">
                 <div className="flex flex-col space-y-1.5 p-6">
                     <h3 className="text-2xl font-semibold whitespace-nowrap leading-none tracking-tight">Create
                         Project</h3>

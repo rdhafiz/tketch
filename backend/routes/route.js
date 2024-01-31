@@ -5,6 +5,7 @@ const profileRoute = require("./profile.route");
 const projectRoute = require("./project.route");
 const userRoute = require("./user.route");
 const stateRoute = require("./state.route");
+const taskRoute = require("./task.route");
 const webRouter = require("./web.route");
 const router = express.Router();
 const authenticateToken = require('../app/middleware/AuthMiddleware');
@@ -16,5 +17,6 @@ router.use("/profile", authenticateToken, profileRoute);
 router.use("/project", authenticateToken, projectRoute);
 router.use("/user", authenticateToken, userRoute);
 router.use("/state", authenticateToken, stateRoute);
+router.use("/task", authenticateToken, taskRoute);
 
 module.exports = router;
