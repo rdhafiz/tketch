@@ -4,11 +4,11 @@ const get = async (req, res) => {
     try {
         const filterData = {
             keyword: req.query.keyword ?? '',
-            status: req.query.status ?? [],
-            label: req.query.label ?? [],
-            priority: req.query.priority ?? [],
-            state: req.query.state ?? [],
-            assignee: req.query.state ?? [],
+            status: req.query.status ?? null,
+            label: req.query.label ?? null,
+            priority: req.query.priority ?? null,
+            state: req.query.state ?? null,
+            assignee: req.query.assignee ?? null,
             page: parseInt(req.query.page) || 1,
             limit: parseInt(req.query.limit) || 50,
             skip: ((req.query.page ?? 1) - 1) * (req.query.limit || 50),
@@ -18,14 +18,27 @@ const get = async (req, res) => {
         let matchCondition = {
             deleted_at: {$eq: null},
             name: {$regex: new RegExp(filterData.keyword, 'i')},
-            // status: {$in: filterData.status},
-            // label: {$in: filterData.label},
-            // priority: {$in: filterData.priority},
-            // state: {$in: filterData.state},
-            // assignee: {
-            //     $elemMatch: {$in: filterData.assignee}
-            // }
         };
+        if (filterData.status) {
+            filterData.status = filterData.status.split(',')
+            matchCondition['status'] = {$in: filterData.status};
+        }
+        if (filterData.priority) {
+            filterData.priority = filterData.priority.split(',')
+            matchCondition['priority'] = {$in: filterData.priority};
+        }
+        if (filterData.state) {
+            filterData.state = filterData.state.split(',')
+            matchCondition['state_id'] = {$in: filterData.state};
+        }
+        if (filterData.label) {
+            filterData.label = filterData.label.split(',')
+            matchCondition['label_id'] = { $elemMatch: {$in: filterData.label}};
+        }
+        if (filterData.assignee) {
+            filterData.assignee = filterData.assignee.split(',')
+            matchCondition['assignee'] = { $elemMatch: {$in: filterData.assignee}};
+        }
         task = await TaskModel.aggregate([
             {
                 $match: matchCondition,
@@ -35,55 +48,79 @@ const get = async (req, res) => {
                 $project: {
                     'name': 1,
                     'description': 1,
-                    'label': 1,
-                    'state': 1,
+                    'label_id': 1,
+                    'state_id': 1,
                     'status': 1,
                     'priority': 1,
                     'assignee': 1,
                     'creator_id': 1,
                 }
             },
-
-            // {
-            //     $addFields: {
-            //         'assignee_as_objectId': {
-            //             $map: {
-            //                 input: "$assignee",
-            //                 as: "assigneeId",
-            //                 in: { $toObjectId: "$$assigneeId" },
-            //             },
-            //         }
-            //     }
-            // },
-            // {
-            //     $lookup: {
-            //         from: "users",
-            //         localField: "assignee_as_objectId",
-            //         foreignField: "_id",
-            //         as: "users"
-            //     }
-            // },
-            // {
-            //     $unwind: "$users"
-            // },
-            // {
-            //     $addFields: {
-            //         user: {
-            //             $mergeObjects: [
-            //                 "$user",
-            //                 {
-            //                     avatarFullPath: {
-            //                         $cond: {
-            //                             if: {$ne: ['$user.avatar', null]},
-            //                             then: {$concat: [process.env.APP_URL, '/uploads/', '$user.avatar']},
-            //                             else: null
-            //                         }
-            //                     }
-            //                 }
-            //             ]
-            //         }
-            //     }
-            // },
+            {
+                $addFields: {
+                    'assignee_as_objectId': {
+                        $map: {
+                            input: "$assignee",
+                            as: "assigneeId",
+                            in: { $toObjectId: "$$assigneeId" },
+                        },
+                    },
+                    'label_as_objectId': {
+                        $map: {
+                            input: "$label_id",
+                            as: "labelId",
+                            in: { $toObjectId: "$$labelId" },
+                        },
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "assignee_as_objectId",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $addFields: {
+                                'avatarFullPath': {
+                                    $cond: {
+                                        if: {$ne: ['$avatar', null]},
+                                        then: {$concat: [process.env.APP_URL, '/uploads/', '$avatar']},
+                                        else: null
+                                    }
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                avatar: 1,
+                                avatarFullPath: 1,
+                                color: 1,
+                            }
+                        }
+                    ],
+                    as: "user"
+                },
+            },
+            {
+                $lookup: {
+                    from: "labels",
+                    localField: "label_as_objectId",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                color: 1,
+                            }
+                        }
+                    ],
+                    as: "label"
+                },
+            },
             {$skip: filterData.skip},
             {$limit: filterData.limit}
         ]).exec();

@@ -30,7 +30,7 @@ const Header = () => {
                         <Link to={`/dashboard`} className="text-3xl font-semibold">tketch</Link></div>
                     <span className="relative flex shrink-0 rounded-full h-9 w-9 overflow-visible " ref={wrapperRef} >
                  {user?.avatarFullPath ? (
-                     <img className={`cursor-pointer`} src={user.avatarFullPath} onClick={() => handleDropDown() } alt=""/>
+                     <img className={`cursor-pointer rounded-full`} src={user.avatarFullPath} onClick={() => handleDropDown() } alt=""/>
                  ) : (
                      <span className={`cursor-pointer flex h-full w-full items-center justify-center rounded-full ${user?.color}`} onClick={() => handleDropDown() }><TwoLetterName name={user.name}/></span>
                  )}

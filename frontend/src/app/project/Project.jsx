@@ -174,7 +174,7 @@ const Project = () => {
                                                                 {
                                                                     project.user.avatarFullPath ? (
                                                                         <div className={`flex h-4 w-4 flex-shrink-0 rounded-full`}>
-                                                                            <img src={project.user.avatarFullPath} alt=""/>
+                                                                            <img className={`rounded-full`} src={project.user.avatarFullPath} alt=""/>
                                                                         </div>
                                                                     ) : (
                                                                         <span className={`flex items-center justify-center h-4 w-4 flex-shrink-0 rounded-full ${project.user.color}`}>
