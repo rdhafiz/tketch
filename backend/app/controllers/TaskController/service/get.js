@@ -71,6 +71,9 @@ const get = async (req, res) => {
                             as: "labelId",
                             in: { $toObjectId: "$$labelId" },
                         },
+                    },
+                    'state_objectId': {
+                        $toObjectId: "$state_id"
                     }
                 }
             },
@@ -120,6 +123,28 @@ const get = async (req, res) => {
                     ],
                     as: "label"
                 },
+            },
+            {
+                $lookup: {
+                    from: "states",
+                    localField: "state_objectId",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                            }
+                        }
+                    ],
+                    as: "state"
+                },
+            },
+            {
+              $unwind: {
+                  path: '$state',
+                  preserveNullAndEmptyArrays: true
+              }
             },
             {$skip: filterData.skip},
             {$limit: filterData.limit}

@@ -31,15 +31,22 @@ const Task = () => {
     const popupRef = useRef();
     const [loadingAction, setLoadingAction] = useState(false)
     const {id} = useParams();
+    const [componentMounted, setComponentMounted] = useState(false);
     const [filter, setFilter] = useState({
         keyword: '',
         members: [],
-        status: [],
+        status: ['active'],
         priority: [],
         state: [],
         label: [],
         page: 1,
         limit: 50,
+    })
+    const [filterDefault, setFilterDefault] = useState({
+        status: [{value: 'active', label: 'Active'}],
+        priority: [],
+        state: [],
+        label: [],
     })
     const [pageInfo, setPageInfo] = useState({
         totalData: 0,
@@ -122,6 +129,19 @@ const Task = () => {
     }
     const isActive = () => {
         return true
+    }
+    const getIconOfPriority = (priority) => {
+        if (priority === 'highest') {
+            return '/src/assets/highest.svg'
+        } else if (priority === 'high') {
+            return '/src/assets/high.svg'
+        } else if (priority === 'medium') {
+            return '/src/assets/medium.svg'
+        } else if (priority === 'low') {
+            return '/src/assets/low.svg'
+        } else {
+            return '/src/assets/lowest.svg'
+        }
     }
     const handlePrevPage = () => {
         setFilter((prevFilter) => ({ ...prevFilter, page: prevFilter.page - 1 }));
@@ -237,16 +257,22 @@ const Task = () => {
                                                 })
                                             )}></Select>
                                             <label>Status</label>
-                                            <Select className={`min-w-64 mb-4`} isMulti isClearable={false} options={[
+                                            <Select className={`min-w-64 mb-4`} isMulti defaultValue={filterDefault.status} isClearable={false} options={[
                                                 {value: 'archive', label: 'Archive'},
                                                 {value: 'active', label: 'Active'},
                                                 {value: 'complete', label: 'Complete'},
-                                            ]} onChange={(newValue) => setFilter(
-                                                (prevData) => ({
-                                                    ...prevData,
-                                                    status: newValue.map(each => each.value),
-                                                })
-                                            )}></Select>
+                                            ]} onChange={(newValue) => {
+                                                setFilter(
+                                                    (prevData) => ({
+                                                        ...prevData,
+                                                        status: newValue.map(each => each.value),
+                                                    })
+                                                );
+                                                setFilterDefault((prevState) => ({
+                                                    ...prevState,
+                                                    status: newValue
+                                                }))
+                                            }}></Select>
                                             <label>Label</label>
                                             <Select className={`min-w-64 mb-4`} isMulti isClearable={false} options={labels}
                                                     onChange={(newValue) => setFilter(
@@ -303,14 +329,65 @@ const Task = () => {
                                                         <Link to={`/dashboard`} className="flex cursor-pointer items-center leading-5 text-gray-700 transition duration-150 ease-in-out">
                                                             <div className="truncate text-gray-500">
                                                                 <div className={`flex items-center`}>
-                                                                    <div className={`font-bold me-4`}>{task.name}</div>
+                                                                    <div className={`font-bold me-16`}>{task.name}</div>
                                                                     {task.label.length > 0 && (
-                                                                        <div className={`flex center`}>
+                                                                        <div className={`flex items-center me-16`}>
                                                                             {task.label.map(l => {
                                                                                 return (
-                                                                                    <div style={{backgroundColor: l.color}} className={`p-1  rounded-md text-white me-2 text-[11px]`}>{l.name}</div>
+                                                                                    <Popup className={`w-auto`} key={l._id}
+                                                                                           trigger={open => (
+                                                                                               <div key={l._id} style={{backgroundColor: l.color}} className={`p-1 leading-3 rounded-full font-bold text-white me-2 text-[11px]`}>{l.name}</div>
+                                                                                           )}
+                                                                                           on={['hover']}
+                                                                                           position="bottom center"
+                                                                                           closeOnDocumentClick
+                                                                                    >
+                                                                                        {l.description && (
+                                                                                            <span> {l.description} </span>
+                                                                                        )}
+                                                                                    </Popup>
                                                                                 )
                                                                             })}
+                                                                        </div>
+                                                                    )}
+                                                                    {task.priority && (
+                                                                        <div className={`capitalize flex items-center me-16`}>
+                                                                            <img className={`w-[20px]`} src={getIconOfPriority(task.priority)} alt=""/>
+                                                                            {task.priority}
+                                                                        </div>
+                                                                    )}
+
+                                                                    {task.state && (
+                                                                        <div className={`capitalize border font-bold p-1 rounded-md text-[12px] flex items-center me-16`}>
+                                                                            {task.state.name}
+                                                                        </div>
+                                                                    )}
+                                                                    {task.user.length > 0 && (
+                                                                        <div className={`flex items-center me-16`}>
+                                                                            {
+                                                                                task.user.map((member) => {
+                                                                                    return (
+                                                                                        <Popup className={`w-auto`} key={member._id}
+                                                                                               trigger={open => (
+                                                                                                   <div className={`relative flex shrink-0 rounded-full h-8 w-8 overflow-visible border-2 first:ms-0  ms-[-10px] hover:z-10 border-white`} >
+                                                                                                       {member?.avatarFullPath ? (
+                                                                                                           <img className={`cursor-pointer rounded-full`} src={member.avatarFullPath} alt=""/>
+                                                                                                       ) : (
+                                                                                                           <span className={`cursor-pointer flex h-full w-full items-center justify-center rounded-full ${member?.color}`}>
+                                                                                                           <TwoLetterName classes={`font-normal`} name={member.name}/>
+                                                                                                       </span>
+                                                                                                       )}
+                                                                                                   </div>
+                                                                                               )}
+                                                                                               on={['hover']}
+                                                                                               position="bottom center"
+                                                                                               closeOnDocumentClick
+                                                                                        >
+                                                                                            <span > {member.name} </span>
+                                                                                        </Popup>
+                                                                                    )
+                                                                                })
+                                                                            }
                                                                         </div>
                                                                     )}
 
