@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Link, useLocation, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import TwoLetterName from "../components/TwoLetterName.jsx";
 import ApiService from "../../services/ApiService.js";
 import ApiRoutes from "../../services/ApiRoutes.js";
@@ -21,6 +21,7 @@ import Select from "react-select";
 
 const Task = () => {
     const {user} = useStore();
+    const navigate = useNavigate()
     const location = useLocation();
     const [project, setProject] = useState(null)
     const [tasks, setTasks] = useState([])
@@ -31,7 +32,7 @@ const Task = () => {
     const popupRef = useRef();
     const [loadingAction, setLoadingAction] = useState(false)
     const {id} = useParams();
-    const [componentMounted, setComponentMounted] = useState(false);
+    const isInitialRender = useRef(true);
     const [filter, setFilter] = useState({
         keyword: '',
         members: [],
@@ -75,9 +76,11 @@ const Task = () => {
             '&status=' + filter.status +
             '&priority=' + filter.priority +
             '&label=' + filter.label +
+            '&member=' + filter.members +
             '&state=' + filter.state, (res) => {
             setTaskLoading(false)
             if (res.status === 'ok') {
+                setPageInfo(res.data.pageInfo)
                 setTasks(res.data.task)
             }
         })
@@ -127,8 +130,32 @@ const Task = () => {
             }
         })
     }
-    const isActive = () => {
-        return true
+    const isActive = (member_id) => {
+        let index = filter.members.indexOf(member_id);
+        return index > -1;
+
+    }
+    const handleMember = (member_id) => {
+        if (filter.members.length === 0) {
+            setFilter((prevData) => ({
+                    ...prevData,
+                    members: [member_id],
+                })
+            );
+        } else {
+            let members = [...filter.members]
+            let index = filter.members.indexOf(member_id)
+            if (index > -1) {
+               members.splice(members.indexOf(member_id), 1)
+            } else {
+                members.push(member_id)
+            }
+            setFilter((prevData) => ({
+                    ...prevData,
+                    members: members,
+                })
+            );
+        }
     }
     const getIconOfPriority = (priority) => {
         if (priority === 'highest') {
@@ -161,7 +188,8 @@ const Task = () => {
         ApiService.POST(ApiRoutes.task+'/'+id, requestData, (res) => {
             setLoadingAction(false);
             if (res.status === 'ok') {
-                getTasks()
+                popupRef.current.close;
+                navigate(`/dashboard/project/${project._id}/task/${res.task_id}`)
             }
         })
     }
@@ -171,14 +199,21 @@ const Task = () => {
         getState()
     }, [location])
     useEffect(() => {
-        getTasks()
-    }, [filter.page, filter.limit, filter.state, filter.priority, filter.status, filter.label, filter.members])
-    useEffect(() => {
+        if (isInitialRender.current) {
+            return;
+        }
         const timeoutId = setTimeout(() => {
             getTasks();
         }, 800);
         return () => clearTimeout(timeoutId);
     }, [filter.keyword]);
+    useEffect(() => {
+        if (isInitialRender.current) {
+            isInitialRender.current = false;
+            return;
+        }
+        getTasks()
+    }, [filter.page, filter.limit, filter.state, filter.priority, filter.status, filter.label, filter.members])
     return (
         <>
             {project != null && !loading ? (
@@ -207,15 +242,16 @@ const Task = () => {
                                 {
                                     project.members.map((member) => {
                                         return (
-                                            <Popup className={`w-auto`} key={member._id}
+                                            <Popup  className={`w-auto`} key={member._id}
                                                 trigger={open => (
-                                                    <div className={`relative flex shrink-0 rounded-full h-8 w-8 overflow-visible border-2 first:ms-0  ms-[-10px] hover:z-10 ${isActive() ? 'border-violet-600 z-10' : 'border-white'}`} >
+                                                    <div onClick={() => handleMember(member._id)} className={`relative flex shrink-0 rounded-full h-8 w-8 overflow-visible border-2 first:ms-0  ms-[-10px] hover:z-10 
+                                                         ${isActive(member._id) ? 'border-violet-600 z-10' : 'border-white'}`} >
                                                         {member?.avatarFullPath ? (
                                                             <img className={`cursor-pointer rounded-full`} src={member.avatarFullPath} alt=""/>
                                                         ) : (
                                                             <span className={`cursor-pointer flex h-full w-full items-center justify-center rounded-full ${member?.color}`}>
-                                                    <TwoLetterName classes={`font-normal`} name={member.name}/>
-                                                </span>
+                                                                <TwoLetterName classes={`font-normal`} name={member.name}/>
+                                                            </span>
                                                         )}
                                                     </div>
                                                 )}
@@ -236,26 +272,38 @@ const Task = () => {
                                     {close => (
                                         <div className={`px-2 -2 max-w-72`}>
                                             <label>State</label>
-                                            <Select className={`min-w-64 mb-4`} isMulti isClearable={false} options={state}
-                                                    onChange={(newValue) => setFilter(
-                                                (prevData) => ({
-                                                    ...prevData,
-                                                    state: newValue.map(each => each.value),
-                                                })
-                                            )}></Select>
+                                            <Select className={`min-w-64 mb-4`} isMulti defaultValue={filterDefault.state} isClearable={false} options={state}
+                                                    onChange={(newValue) => {
+                                                        setFilter(
+                                                            (prevData) => ({
+                                                                ...prevData,
+                                                                state: newValue.map(each => each.value),
+                                                            })
+                                                        );
+                                                        setFilterDefault((prevState) => ({
+                                                            ...prevState,
+                                                            state: newValue
+                                                        }))
+                                                    }}></Select>
                                             <label>Priority</label>
-                                            <Select className={`min-w-64 mb-4`} isMulti isClearable={false} options={[
-                                                {value: 'highest', label: 'Height'},
+                                            <Select className={`min-w-64 mb-4`} isMulti defaultValue={filterDefault.priority} isClearable={false} options={[
+                                                {value: 'highest', label: 'Highest'},
                                                 {value: 'high', label: 'High'},
                                                 {value: 'medium', label: 'Medium'},
                                                 {value: 'low', label: 'Low'},
                                                 {value: 'lowest', label: 'Lowest'},
-                                            ]} onChange={(newValue) => setFilter(
-                                                (prevData) => ({
-                                                    ...prevData,
-                                                    priority: newValue.map(each => each.value),
-                                                })
-                                            )}></Select>
+                                            ]} onChange={(newValue) => {
+                                                setFilter(
+                                                    (prevData) => ({
+                                                        ...prevData,
+                                                        priority: newValue.map(each => each.value),
+                                                    })
+                                                );
+                                                setFilterDefault((prevState) => ({
+                                                    ...prevState,
+                                                    priority: newValue
+                                                }))
+                                            }}></Select>
                                             <label>Status</label>
                                             <Select className={`min-w-64 mb-4`} isMulti defaultValue={filterDefault.status} isClearable={false} options={[
                                                 {value: 'archive', label: 'Archive'},
@@ -274,13 +322,19 @@ const Task = () => {
                                                 }))
                                             }}></Select>
                                             <label>Label</label>
-                                            <Select className={`min-w-64 mb-4`} isMulti isClearable={false} options={labels}
-                                                    onChange={(newValue) => setFilter(
-                                                        (prevData) => ({
-                                                            ...prevData,
-                                                            label: newValue.map(each => each.value),
-                                                        })
-                                            )}></Select>
+                                            <Select className={`min-w-64 mb-4`} isMulti defaultValue={filterDefault.label} isClearable={false} options={labels}
+                                                    onChange={(newValue) => {
+                                                        setFilter(
+                                                            (prevData) => ({
+                                                                ...prevData,
+                                                                label: newValue.map(each => each.value),
+                                                            })
+                                                        );
+                                                        setFilterDefault((prevState) => ({
+                                                            ...prevState,
+                                                            label: newValue
+                                                        }))
+                                                    }}></Select>
                                         </div>
                                     )}
                                 </Popup>
@@ -326,10 +380,12 @@ const Task = () => {
                                             <div className="rounded-lg shadow bg-gray-100 mb-3" key={task._id}>
                                                 <div className="space-y-4 divide-y pb-3">
                                                     <div className={`flex px-4 pt-3 items-center ${task.status === 'complete' ? 'line-through' : ''}`}>
-                                                        <Link to={`/dashboard`} className="flex cursor-pointer items-center leading-5 text-gray-700 transition duration-150 ease-in-out">
+                                                        <Link to={`/dashboard/project/${project._id}/task/${task._id}`} className="flex cursor-pointer items-center leading-5 text-gray-700 transition duration-150 ease-in-out">
                                                             <div className="truncate text-gray-500">
                                                                 <div className={`flex items-center`}>
-                                                                    <div className={`font-bold me-16`}>{task.name}</div>
+                                                                    <div className={`font-bold me-16`}>{task.name}
+                                                                        <div className={`text-gray-400 text-sm font-normal`}>#{task.number} opened by {task.creator.name}</div>
+                                                                    </div>
                                                                     {task.label.length > 0 && (
                                                                         <div className={`flex items-center me-16`}>
                                                                             {task.label.map(l => {

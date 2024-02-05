@@ -12,9 +12,8 @@ import ResetPassword from "../app/auth/ResetPassword.jsx";
 import Profile from "../app/profile/Profile.jsx";
 import AddProject from "../app/project/AddProject.jsx";
 import EditProject from "../app/project/EditProject.jsx";
-import ApiService from "../services/ApiService.js";
-import ApiRoutes from "../services/ApiRoutes.js";
 import Task from "../app/task/Task.jsx";
+import TaskSingle from "../app/task/TaskSingle.jsx";
 export const router = createBrowserRouter(
     [
         {
@@ -68,6 +67,10 @@ export const router = createBrowserRouter(
                 {
                     path:'/dashboard/project/:id/task',
                     element:<Task/>,
+                },
+                {
+                    path:'/dashboard/project/:id/task/:id',
+                    element:<TaskSingle/>,
                 },
             ]
         },

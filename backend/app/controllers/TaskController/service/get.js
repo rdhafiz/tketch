@@ -1,14 +1,16 @@
 const TaskModel = require("../../../model/Task");
+const mongoose = require("mongoose");
 
 const get = async (req, res) => {
     try {
+        const projectId = req.params.projectId
         const filterData = {
             keyword: req.query.keyword ?? '',
             status: req.query.status ?? null,
             label: req.query.label ?? null,
             priority: req.query.priority ?? null,
             state: req.query.state ?? null,
-            assignee: req.query.assignee ?? null,
+            assignee: req.query.member ?? null,
             page: parseInt(req.query.page) || 1,
             limit: parseInt(req.query.limit) || 50,
             skip: ((req.query.page ?? 1) - 1) * (req.query.limit || 50),
@@ -18,6 +20,7 @@ const get = async (req, res) => {
         let matchCondition = {
             deleted_at: {$eq: null},
             name: {$regex: new RegExp(filterData.keyword, 'i')},
+            project_id: {$eq: new mongoose.Types.ObjectId(projectId) }
         };
         if (filterData.status) {
             filterData.status = filterData.status.split(',')
@@ -53,6 +56,8 @@ const get = async (req, res) => {
                     'status': 1,
                     'priority': 1,
                     'assignee': 1,
+                    'number': 1,
+                    'due_at': 1,
                     'creator_id': 1,
                 }
             },
@@ -74,6 +79,9 @@ const get = async (req, res) => {
                     },
                     'state_objectId': {
                         $toObjectId: "$state_id"
+                    },
+                    'creator_objectId': {
+                        $toObjectId: "$creator_id"
                     }
                 }
             },
@@ -146,16 +154,39 @@ const get = async (req, res) => {
                   preserveNullAndEmptyArrays: true
               }
             },
+
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "creator_objectId",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                            }
+                        }
+                    ],
+                    as: "creator"
+                },
+            },
+            {
+                $unwind: {
+                    path: '$creator',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             {$skip: filterData.skip},
             {$limit: filterData.limit}
         ]).exec();
-        const totalProjects = await TaskModel.countDocuments({
+        const totalTask  = await TaskModel.countDocuments({
             $and: [matchCondition],
         });
         let pageInfo = {
-            totalData: totalProjects,
-            totalPages: Math.ceil(totalProjects / filterData.limit),
-            hasNextPage: filterData.page < Math.ceil(totalProjects / filterData.limit),
+            totalData: totalTask    ,
+            totalPages: Math.ceil(totalTask  / filterData.limit),
+            hasNextPage: filterData.page < Math.ceil(totalTask   / filterData.limit),
             hasPrevPage: filterData.page > 1,
         }
         result.task = task

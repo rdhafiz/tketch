@@ -18,15 +18,17 @@ const create = async (req, res) => {
         if (validator.error !== undefined) {
             return res.status(400).json(Validator.parseError(validator.error));
         }
+        const lastTask =  await TaskModel.find({project_id: projectId}).sort({ _id: -1 }).limit(1).exec()
+        console.log(lastTask)
         const taskData = {
             name: name,
             project_id: projectId,
             creator_id: sessionUser._id,
+            number: lastTask.length > 0 ? lastTask[0].number + 1 : 1
         }
-        console.log(taskData)
         //create a new task
-        await TaskModel.create(taskData)
-        return res.status(201).json({message: 'Task has been created successfully.', status: 'ok'})
+        const task = await TaskModel.create(taskData)
+        return res.status(201).json({message: 'Task has been created successfully.', task_id: task._id, status: 'ok'})
     } catch (error) {
         res.status(500).send(error.message);
     }

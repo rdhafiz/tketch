@@ -25,9 +25,9 @@ const Sidenav = () => {
             setProjects(project);
             if (project.length > 0) {
                 setIsUseEffectRan(true)
-            }else {
-                getProjects()
             }
+        } else {
+            getProjects()
         }
     }, [project])
     return (

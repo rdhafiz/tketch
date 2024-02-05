@@ -9,6 +9,10 @@ const taskSchema = mongoose.Schema({
         type: String,
         default: '',
     },
+    number: {
+        type: Number,
+        default: null,
+    },
     project_id: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'Project',
@@ -48,6 +52,10 @@ const taskSchema = mongoose.Schema({
     creator_id: {
         type: String,
         required: true
+    },
+    due_at: {
+        type: Date,
+        default: null,
     },
     deleted_at: {
         type: Date,
