@@ -20,7 +20,6 @@ import {toast} from "react-toastify";
 import Select from "react-select";
 
 const Task = () => {
-    const {user} = useStore();
     const navigate = useNavigate()
     const location = useLocation();
     const [project, setProject] = useState(null)
@@ -223,13 +222,12 @@ const Task = () => {
                             <div className={`flex cursor-pointer items-center leading-5 text-gray-700 transition duration-150 ease-in-out me-10`}>
                                 {project.iconFullPath ? (
                                     <span className="block h-9 w-9 flex-shrink-0 rounded-md">
-                                <img className={`rounded-md`} src={project.iconFullPath} alt=""/>
-                            </span>
+                                        <img className={`rounded-md`} src={project.iconFullPath} alt=""/>
+                                    </span>
                                 ) : (
-                                    <span
-                                        className={`flex items-center justify-center h-9 w-9 flex-shrink-0 rounded-md bg-cyan-500`}>
-                                <TwoLetterName classes={`font-normal`} name={project.name}/>
-                            </span>
+                                    <span className={`flex items-center justify-center h-9 w-9 flex-shrink-0 rounded-md bg-cyan-500`}>
+                                        <TwoLetterName classes={`font-normal`} name={project.name}/>
+                                    </span>
                                 )}
                                 <div className="truncate text-gray-500 ms-4">
                                     <div className={`flex items-center`}>
@@ -380,28 +378,35 @@ const Task = () => {
                                             <div className="rounded-lg shadow bg-gray-100 mb-3" key={task._id}>
                                                 <div className="space-y-4 divide-y pb-3">
                                                     <div className={`flex px-4 pt-3 items-center ${task.status === 'complete' ? 'line-through' : ''}`}>
-                                                        <Link to={`/dashboard/project/${project._id}/task/${task._id}`} className="flex cursor-pointer items-center leading-5 text-gray-700 transition duration-150 ease-in-out">
+                                                        <Link to={`/dashboard/project/${project._id}/task/${task._id}`} className="flex cursor-pointer w-[90%] items-center leading-5 text-gray-700 transition duration-150 ease-in-out">
                                                             <div className="truncate text-gray-500">
                                                                 <div className={`flex items-center`}>
-                                                                    <div className={`font-bold me-16`}>{task.name}
+                                                                    <div className={`font-bold me-16 w-80`}>
+                                                                        <div className={`whitespace-pre-wrap`}>{task.name}</div>
                                                                         <div className={`text-gray-400 text-sm font-normal`}>#{task.number} opened by {task.creator.name}</div>
                                                                     </div>
                                                                     {task.label.length > 0 && (
-                                                                        <div className={`flex items-center me-16`}>
+                                                                        <div className={`flex items-center me-16 flex-wrap`}>
                                                                             {task.label.map(l => {
                                                                                 return (
-                                                                                    <Popup className={`w-auto`} key={l._id}
-                                                                                           trigger={open => (
-                                                                                               <div key={l._id} style={{backgroundColor: l.color}} className={`p-1 leading-3 rounded-full font-bold text-white me-2 text-[11px]`}>{l.name}</div>
-                                                                                           )}
-                                                                                           on={['hover']}
-                                                                                           position="bottom center"
-                                                                                           closeOnDocumentClick
-                                                                                    >
-                                                                                        {l.description && (
-                                                                                            <span> {l.description} </span>
+                                                                                    <>
+                                                                                        {l.description ? (
+                                                                                            <Popup className={`w-auto`} key={l._id}
+                                                                                                   trigger={open => (
+                                                                                                       <div key={l._id} style={{backgroundColor: l.color}} className={`p-1 mb-1 leading-3 rounded-full font-bold text-white me-2 text-[11px]`}>{l.name}</div>
+                                                                                                   )}
+                                                                                                   on={['hover']}
+                                                                                                   position="bottom center"
+                                                                                                   closeOnDocumentClick
+                                                                                            >
+                                                                                                {l.description && (
+                                                                                                    <span> {l.description} </span>
+                                                                                                )}
+                                                                                            </Popup>
+                                                                                        ) : (
+                                                                                            <div key={l._id} style={{backgroundColor: l.color}} className={`p-1 mb-1 leading-3 rounded-full font-bold text-white me-2 text-[11px]`}>{l.name}</div>
                                                                                         )}
-                                                                                    </Popup>
+                                                                                    </>
                                                                                 )
                                                                             })}
                                                                         </div>
