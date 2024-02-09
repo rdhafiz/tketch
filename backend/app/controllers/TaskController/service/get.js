@@ -19,7 +19,10 @@ const get = async (req, res) => {
         let result = {}
         let matchCondition = {
             deleted_at: {$eq: null},
-            name: {$regex: new RegExp(filterData.keyword, 'i')},
+            $or: [
+                { name: {$regex: new RegExp(filterData.keyword, 'i')}},
+                { number: isNaN(parseInt(filterData.keyword)) ? '' : parseInt(filterData.keyword)  },
+            ],
             project_id: {$eq: new mongoose.Types.ObjectId(projectId) }
         };
         if (filterData.status) {

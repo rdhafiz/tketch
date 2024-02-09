@@ -5,9 +5,16 @@ const deleteTask = require('./service/delete');
 const updateStatus = require('./service/updateStatus');
 const getSingle = require('./service/getSingle');
 const getStatus = require('./service/getStatus');
+const nameUpdate = require('./service/nameUpdate');
+const descUpdate = require('./service/descUpdate');
+const addComment = require('./service/addComment');
+const manageAssignee = require('./service/manageAssignee');
+const manageLabel = require('./service/manageLabel');
+const manageState = require('./service/manageState');
+const updatePriority = require('./service/updatePriority');
 const taskController = {
     /**
-     * @desc create function called by route to create project
+     * @desc create function called by route to create task
      * @param {Object} req - request object
      * @param {Object} res - response object
      * @access - private
@@ -16,7 +23,7 @@ const taskController = {
         await create(req, res);
     },
     /**
-     * @desc update function called by route to update project
+     * @desc update function called by route to update task
      * @param {Object} req - request object
      * @param {Object} res - response object
      * @access - private
@@ -25,7 +32,7 @@ const taskController = {
         await update(req, res);
     },
     /**
-     * @desc get function called by route to get single or paginate project
+     * @desc get function called by route to get single or paginate task
      * @param {Object} req - request object
      * @param {Object} res - response object
      * @access - private
@@ -34,7 +41,7 @@ const taskController = {
         await get(req, res);
     },
     /**
-     * @desc delete function called by route to delete project
+     * @desc delete function called by route to delete task
      * @param {Object} req - request object
      * @param {Object} res - response object
      * @access - private
@@ -43,7 +50,7 @@ const taskController = {
             await deleteTask(req, res);
     },
     /**
-     * @desc updateStatus function called by route to update status of a project
+     * @desc updateStatus function called by route to update status of a task
      * @param {Object} req - request object
      * @param {Object} res - response object
      * @access - private
@@ -52,7 +59,16 @@ const taskController = {
         await updateStatus(req, res);
     },
     /**
-     * @desc get single function called by route to get single a project
+     * @desc updatePriority function called by route to update priority of a task
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    updatePriority: async (req, res) => {
+        await updatePriority(req, res);
+    },
+    /**
+     * @desc get single function called by route to get single a task
      * @param {Object} req - request object
      * @param {Object} res - response object
      * @access - private
@@ -61,13 +77,67 @@ const taskController = {
         await getSingle(req, res);
     },
     /**
-     * @desc getStatus function called by route to get status of project
+     * @desc getStatus function called by route to get status of task
      * @param {Object} req - request object
      * @param {Object} res - response object
      * @access - private
      */
     getStatus: async (req, res) => {
         await getStatus(req, res);
+    },
+    /**
+     * @desc nameUpdate function called by route to update the task name
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    nameUpdate: async (req, res) => {
+        await nameUpdate(req, res);
+    },
+    /**
+     * @desc descUpdate function called by route to update the task description
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    descUpdate: async (req, res) => {
+        await descUpdate(req, res);
+    },
+    /**
+     * @desc addComment function called by route to add comment
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    addComment: async (req, res) => {
+        await addComment(req, res);
+    },
+    /**
+     * @desc manageAssignee function called by route to update assignee
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    manageAssignee: async (req, res) => {
+        await manageAssignee(req, res);
+    },
+    /**
+     * @desc manageLabel function called by route to update label
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    manageLabel: async (req, res) => {
+        await manageLabel(req, res);
+    },
+    /**
+     * @desc manageState function called by route to update state
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    manageState: async (req, res) => {
+        await manageState(req, res);
     },
 }
 

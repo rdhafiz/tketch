@@ -97,6 +97,12 @@ const getSingle = async (req, res) => {
                 },
             },
             {
+                $unwind: {
+                    path: '$reporter',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $lookup: {
                     from: "labels",
                     localField: "label_as_objectId",
@@ -107,6 +113,7 @@ const getSingle = async (req, res) => {
                                 _id: 1,
                                 name: 1,
                                 color: 1,
+                                description: 1,
                             }
                         }
                     ],
@@ -133,24 +140,6 @@ const getSingle = async (req, res) => {
                 $unwind: {
                     path: '$state',
                     preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $project: {
-                    'name': 1,
-                    'description': 1,
-                    'label_id': 1,
-                    'label': 1,
-                    'members': 1,
-                    'state': 1,
-                    'state_id': 1,
-                    'status': 1,
-                    'priority': 1,
-                    'assignee': 1,
-                    'reporter': 1,
-                    'number': 1,
-                    'due_at': 1,
-                    'creator_id': 1,
                 }
             },
         ]).exec();
