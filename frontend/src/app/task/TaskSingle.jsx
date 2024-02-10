@@ -13,6 +13,8 @@ import ApiService from "../../services/ApiService.js";
 import ApiRoutes from "../../services/ApiRoutes.js";
 import useStore from "../../store/store.js";
 import { Editor } from '@tinymce/tinymce-react';
+import AuthService from "../../services/AuthService.js";
+import {toast} from "react-toastify";
 
 const TaskSingle = () => {
     const {user} = useStore();
@@ -30,6 +32,7 @@ const TaskSingle = () => {
         labelDelete: false,
         state: false,
         stateDelete: false,
+        attachment: false,
     });
     const [task, setTask] = useState(null);
     const [taskDescription, setTaskDescription] = useState('');
@@ -45,9 +48,10 @@ const TaskSingle = () => {
     useEffect(() => {
         getProject()
         getTask()
-        getLabel()
-        getState()
     }, [])
+    useEffect(() => {
+        window.dispatchEvent(new Event('resize'));
+    }, [labels, states])
     const getProject = () => {
         ApiService.GET(ApiRoutes.project + '/' + id, (res) => {
             if (res.status === 'ok') {
@@ -254,7 +258,7 @@ const TaskSingle = () => {
         })
     }
     const handleState = (state_id) => {
-        ApiService.PATCH(ApiRoutes.task + '/' + taskId + '/manage/state', {state: state_id}, (res) => {
+        ApiService.PATCH(ApiRoutes.task + '/' + taskId + '/manage/state', {state_id: state_id}, (res) => {
             if (res.status === 'ok') {
                 states.map(state => {
                     if (state._id == state_id) {
@@ -305,6 +309,41 @@ const TaskSingle = () => {
         } else {
             return '/src/assets/lowest.svg'
         }
+    }
+    const handleSubmitAttachment = (event) => {
+        event.preventDefault();
+        const formData = new FormData();
+        formData.append('file', event.target.files[0])
+        setLoading((prevLoading) => ({
+            ...prevLoading,
+            attachment: true,
+        }));
+        ApiService.PATCH_FORMDATA(ApiRoutes.task + '/' + taskId + '/add/attachment', formData, (res) => {
+            setLoading((prevLoading) => ({
+                ...prevLoading,
+                attachment: false,
+            }));
+            if (res.status === 'ok') {
+                setTask((prevState => ({
+                    ...prevState,
+                    attachment: res.attachments,
+                })))
+                popupRef.current.close();
+            }
+        })
+    }
+    const deleteAttachment = (file_id) => {
+        setLoading((prevState => ({...prevState, attachment: true})))
+        ApiService.DELETE(ApiRoutes.task + '/' + taskId + '/delete/attachment/' + file_id, (res) => {
+            setLoading((prevState => ({...prevState, attachment: false})))
+            if (res.status === 'ok') {
+                setTask((prevState => ({
+                    ...prevState,
+                    attachment: res.attachments,
+                })))
+                popupRefNested.current.close()
+            }
+        })
     }
     return (
         <>
@@ -569,13 +608,15 @@ const TaskSingle = () => {
                         </div>
                     </div>
                     <div id={`info-section`} className={`w-1/3 `}>
-                        <div className={`p-3 bg-white border-[1px] rounded-md`}>
+                        <div className={`p-3 bg-white border-[1px] h-[80vh] overflow-auto rounded-md`}>
                             <div className={`border-b-[1px] mb-5`}>
                                 <div className={`flex items-center justify-between mb-2`}>
-                                    <div>Status</div>
+                                    <div className={`text-[16px] font-medium text-teal-900`}>Status</div>
                                 </div>
                                 {task.status != null ? (
-                                        <Popup ref={popupRef}  trigger={ <div className={`capitalize px-2 py-1 flex items-center w-36 mb-4 border-white border-[1px] hover:border-gray-300 focus:border-gray-300 rounded-md`}>
+                                        <Popup ref={popupRef}  trigger={ <div className={`capitalize 
+                                        px-2 py-1 flex items-center w-36 mb-4 justify-center rounded-md  text-white
+                                        ${task.status === 'archived' ? 'bg-gray-600' : task.status === 'active' ? 'bg-blue-600' : 'bg-green-600'}`}>
                                             {task.status}
                                         </div>} arrow={false}
                                                 position={"bottom center"}>
@@ -584,11 +625,11 @@ const TaskSingle = () => {
                                                     <div className={`capitalize flex items-center mb-3 cursor-pointer`} onClick={() => handleStatus('active')}>
                                                         Active
                                                     </div>
-                                                    <div className={`capitalize flex items-center mb-3 cursor-pointer`} onClick={() => handleStatus('archive')}>
-                                                        Archive
+                                                    <div className={`capitalize flex items-center mb-3 cursor-pointer`} onClick={() => handleStatus('archived')}>
+                                                        Archived
                                                     </div>
-                                                    <div className={`capitalize flex items-center mb-3 cursor-pointer`} onClick={() => handleStatus('complete')}>
-                                                        Complete
+                                                    <div className={`capitalize flex items-center mb-3 cursor-pointer`} onClick={() => handleStatus('completed')}>
+                                                        Completed
                                                     </div>
                                                 </div>
                                             )}
@@ -599,7 +640,7 @@ const TaskSingle = () => {
                             </div>
                             <div className={`border-b-[1px] mb-5`}>
                                 <div className={`flex items-center justify-between mb-2`}>
-                                    <div>Priority</div>
+                                    <div className={`text-[16px] font-medium text-teal-900`}>Priority</div>
                                 </div>
                                 {task.priority != null ? (
                                         <Popup ref={popupRef}  trigger={ <div className={`capitalize px-2 py-1 flex items-center w-36 mb-4 border-white border-[1px] hover:border-gray-300 active:border-gray-300 rounded-md`}>
@@ -638,7 +679,7 @@ const TaskSingle = () => {
                             </div>
                             <div className={`border-b-[1px] mb-5`}>
                                 <div className={`flex items-center justify-between mb-2`}>
-                                    <div className={`text-gray-500`}>Assignee</div>
+                                    <div className={`text-[16px] font-medium text-teal-900`}>Assignee</div>
                                     <div className={``}>
                                         <Popup ref={popupRef}  trigger={<i className={`cursor-pointer text-gray-400 text-2xl`}><BiSolidCog /></i>} position="bottom right">
                                             {close => (
@@ -702,7 +743,7 @@ const TaskSingle = () => {
                             </div>
                             <div className={`border-b-[1px] mb-5`}>
                                 <div className={`flex items-center justify-between mb-2`}>
-                                    <div>Reporter</div>
+                                    <div className={`text-[16px] font-medium text-teal-900`}>Reporter</div>
                                     <div></div>
                                 </div>
                                 <div className={`flex items-center mb-4`}>
@@ -720,16 +761,16 @@ const TaskSingle = () => {
                             </div>
                             <div className={`border-b-[1px] mb-5`}>
                                 <div className={`flex items-center justify-between mb-2`}>
-                                    <div>Labels</div>
+                                    <div className={`text-[16px] font-medium text-teal-900`}>Labels</div>
                                     <div>
                                         <Popup ref={popupRef} nested trigger={<span><i onClick={() => getLabel()} className={`cursor-pointer text-gray-400 text-2xl`}><BiSolidCog /></i></span>}
-                                               keepTooltipInside=".h-screen" position={['bottom right']}>
+                                               keepTooltipInside=".h-screen" position={['left center']}>
                                             {close => (
                                                 <>
                                                     <div className={`flex justify-between items-center mb-3 mt-3 px-3`}>
                                                         <input onChange={(e) => handleSearchLabel(e)} type="text" className={`input max-w-48`} placeholder={`Search..`}/>
                                                         <Popup offsetX={15} ref={popupRefNested}  trigger={ <button className={`btn-black !w-12 justify-center`}>New</button>}
-                                                               keepTooltipInside=".h-screen" position={['bottom right']}>
+                                                               keepTooltipInside=".h-screen" position={['left center']}>
                                                             {close => (
                                                                 <div className={`px-2 py-2 max-w-72`}>
                                                                     <form onSubmit={handleSubmitLabel}>
@@ -897,10 +938,10 @@ const TaskSingle = () => {
                             </div>
                             <div className={`border-b-[1px] mb-5`}>
                                 <div className={`flex items-center justify-between mb-2`}>
-                                    <div>State</div>
+                                    <div className={`text-[16px] font-medium text-teal-900`}>State</div>
                                     <div>
-                                        <Popup ref={popupRef} nested trigger={<i onClick={() => getState()} className={`cursor-pointer text-gray-400 text-2xl`}><BiSolidCog /></i>}
-                                               keepTooltipInside=".h-screen" position={['bottom right']}>
+                                        <Popup ref={popupRef} nested trigger={<span><i onClick={() => getState()} className={`cursor-pointer text-gray-400 text-2xl`}><BiSolidCog /></i></span>}
+                                               keepTooltipInside=".h-screen" position={['left center']}>
                                             {close => (
                                                 <>
                                                     <div className={`flex justify-between items-center mb-3 mt-3 px-3`}>
@@ -1012,6 +1053,91 @@ const TaskSingle = () => {
                                     <div className={`capitalize border font-bold p-2 w-max rounded-md text-[12px] flex items-center mb-4`}>{task.state.name}</div>
                                 ) : (
                                     <div className={`text-gray-500 mb-4`}>No state has been set yet</div>
+                                )}
+                            </div>
+                            <div className={`border-b-[1px] mb-5`}>
+                                <div className={`flex items-center justify-between mb-2`}>
+                                    <div className={`text-[16px] font-medium text-teal-900`}>Attachments</div>
+                                    <div>
+                                        <Popup ref={popupRef} nested trigger={<span><i className={`cursor-pointer text-gray-400 text-2xl`}><BiSolidCog /></i></span>}
+                                               keepTooltipInside=".h-screen" position={['left center']}>
+                                            {close => (
+                                                <>
+                                                    <div className="flex items-center space-x-4">
+                                                        <div
+                                                            className="border-2 border-dashed border-gray-200 rounded-lg w-full h-24 flex items-center justify-center p-4">
+                                                            <input className="hidden" id="file-upload" type="file" onChange={(event) => handleSubmitAttachment(event)}/>
+                                                            {loading.attachment ? (
+                                                                <div className="h-6 w-6 border-2 border-gray-500 rounded-full animate-pulse"></div>
+                                                            ) : (
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    width="24"
+                                                                    height="24"
+                                                                    viewBox="0 0 24 24"
+                                                                    fill="none"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="2"
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    className="w-6 h-6"
+                                                                >
+                                                                    <path
+                                                                        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                                                    <line x1="12" x2="12" y1="3" y2="15"></line>
+                                                                </svg>
+                                                            )}
+                                                            <label htmlFor="file-upload"
+                                                                   className="cursor-pointer flex items-center space-x-2 ms-2">
+
+                                                                <span className="text-sm font-medium text-gray-500">Click here to upload</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </>
+
+                                            )}
+                                        </Popup>
+                                    </div>
+                                </div>
+                                {task?.attachment?.length > 0 ? (
+                                    <>
+                                        {
+                                            task.attachment.map(file => {
+                                                return(
+                                                    <div className={`flex items-center justify-between`} key={file._id}>
+                                                        <a className={`mb-3 text-cyan-600`} target={`_blank`} href={file.fileFullPath}>{file.file_name}</a>
+                                                        <div>
+                                                            <Popup offsetX={0} ref={popupRefNested} trigger={<button><span
+                                                                className={`cursor-pointer`}><BiTrash></BiTrash></span>
+                                                            </button>} keepTooltipInside=".h-screen" position={["bottom right"]}>
+                                                                {close => (
+                                                                    <div className={`px-2 py-2`}>
+                                                                        <div className={`mb-4 text-sm text-red-500`}>Do you want to delete
+                                                                            this attachment?
+                                                                        </div>
+                                                                        <div className={`flex justify-end items-center`}>
+                                                                            <button
+                                                                                className={`btn-white btn-sm me-2 min-w-12 justify-center`}
+                                                                                onClick={close}>No
+                                                                            </button>
+                                                                            <button className={`btn-black btn-sm max-w-12 ${loading.attachment ? 'btn-loading' : ''}`} onClick={() => deleteAttachment(file._id)}>Yes</button>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </Popup>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+
+                                        }
+                                    </>
+
+                                    // <div className={`capitalize border font-bold p-2 w-max rounded-md text-[12px] flex items-center mb-4`}>{task.state.name}</div>
+                                ) : (
+                                    <div className={`text-gray-500 mb-4`}>No attachment found</div>
                                 )}
                             </div>
                         </div>

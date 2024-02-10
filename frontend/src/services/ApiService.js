@@ -7,6 +7,7 @@ let headers = {
 const ApiService = {
 
     POST: function (url, param, callback)  {
+        this.ClearErrorHandler()
         headers['authorization'] = AuthService.getAccessToken(false)
         axios.post(url, param, {headers: headers}).then((response) => {
             if (response.status === 200 || response.status === 201) {
@@ -23,6 +24,7 @@ const ApiService = {
         })
     },
     PATCH: function (url, param, callback)  {
+        this.ClearErrorHandler()
         headers['authorization'] = AuthService.getAccessToken(false)
         axios.patch(url, param, {headers: headers}).then((response) => {
             if (response.status === 200 || response.status === 201) {
@@ -39,6 +41,7 @@ const ApiService = {
         })
     },
     POST_FORMDATA: function (url, param, callback) {
+        this.ClearErrorHandler()
         headers['authorization'] = AuthService.getAccessToken(false)
         headers['Content-Type'] = 'multipart/form-data';
         axios.post(url, param, {headers: headers}).then((response) => {
@@ -56,6 +59,7 @@ const ApiService = {
         })
     },
     PATCH_FORMDATA: function (url, param, callback) {
+        this.ClearErrorHandler()
         headers['authorization'] = AuthService.getAccessToken(false)
         headers['Content-Type'] = 'multipart/form-data';
         axios.patch(url, param, {headers: headers}).then((response) => {
@@ -73,6 +77,7 @@ const ApiService = {
         })
     },
     GET: function (url, callback)  {
+        this.ClearErrorHandler()
         headers['authorization'] = AuthService.getAccessToken(false)
         axios.get(url, {headers: headers}).then((response) => {
             if (response.status === 200) {
@@ -89,6 +94,7 @@ const ApiService = {
         })
     },
     DELETE: function (url, callback)  {
+        this.ClearErrorHandler()
         headers['authorization'] = AuthService.getAccessToken(false)
         axios.delete(url, {headers: headers}).then((response) => {
             if (response.status === 200) {

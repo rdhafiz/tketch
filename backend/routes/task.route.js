@@ -16,6 +16,8 @@ router.patch("/:id/manage/label", TaskController.manageLabel);
 router.patch("/:id/manage/state", TaskController.manageState);
 router.patch("/:id/update/status", TaskController.updateStatus);
 router.patch("/:id/update/priority", TaskController.updatePriority);
+router.patch("/:id/add/attachment", TaskController.addAttachment);
+router.delete("/:id/delete/attachment/:attachmentId", TaskController.deleteAttachment);
 router.delete("/:id", TaskController.delete);
 
 module.exports = router;

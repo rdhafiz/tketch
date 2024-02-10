@@ -20,7 +20,7 @@ const addComment = async (req, res) => {
             user_id: sessionUser._id,
             comment: comment,
         }
-        const task = await TaskModel.updateOne({_id: id}, {comments: commentData}).exec()
+        const task = await TaskModel.updateOne({_id: id}, {$push: {comments: commentData}}).exec()
         if (task.modifiedCount > 0) {
             // Returning a 200 OK response with message
             return res.status(200).json({ message: 'Task comment has been created successfully', status: 'ok'});

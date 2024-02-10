@@ -11,7 +11,6 @@ const getSingle = async (req, res) => {
             {
                 $match: {_id: new mongoose.Types.ObjectId(filterData.id)},
             },
-
             {
                 $addFields: {
                     'assignee_as_objectId': {
@@ -140,6 +139,24 @@ const getSingle = async (req, res) => {
                 $unwind: {
                     path: '$state',
                     preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    'attachment': {
+                        $map: {
+                            input: '$attachment',
+                            as: 'file',
+                            in: {
+                                $mergeObjects: [
+                                    '$$file',
+                                    {
+                                        fileFullPath: { $concat: [process.env.APP_URL, '/uploads/', '$$file.file_path'] }
+                                    }
+                                ]
+                            }
+                        }
+                    }
                 }
             },
         ]).exec();

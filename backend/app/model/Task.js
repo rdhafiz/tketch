@@ -38,6 +38,7 @@ const taskSchema = mongoose.Schema({
     attachment: [
         {
             user_id: {type: String, required: true},
+            file_name: {type: String, required: true},
             file_path: {type: String, required: true},
             created_at: {type: Date, default: Date.now()}}
     ],

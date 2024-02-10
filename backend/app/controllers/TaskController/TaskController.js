@@ -12,6 +12,8 @@ const manageAssignee = require('./service/manageAssignee');
 const manageLabel = require('./service/manageLabel');
 const manageState = require('./service/manageState');
 const updatePriority = require('./service/updatePriority');
+const addAttachment = require('./service/addAttachment');
+const deleteAttachment = require('./service/deleteAttachment');
 const taskController = {
     /**
      * @desc create function called by route to create task
@@ -138,6 +140,24 @@ const taskController = {
      */
     manageState: async (req, res) => {
         await manageState(req, res);
+    },
+    /**
+     * @desc addAttachment function called by route to add attachment
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    addAttachment: async (req, res) => {
+        await addAttachment(req, res);
+    },
+    /**
+     * @desc deleteAttachment function called by route to delete attachment
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    deleteAttachment: async (req, res) => {
+        await deleteAttachment(req, res);
     },
 }
 
