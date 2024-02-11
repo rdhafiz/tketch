@@ -18,6 +18,7 @@ router.patch("/:id/update/status", TaskController.updateStatus);
 router.patch("/:id/update/priority", TaskController.updatePriority);
 router.patch("/:id/add/attachment", TaskController.addAttachment);
 router.delete("/:id/delete/attachment/:attachmentId", TaskController.deleteAttachment);
+router.patch("/:id/due/date", TaskController.dueDate);
 router.delete("/:id", TaskController.delete);
 
 module.exports = router;

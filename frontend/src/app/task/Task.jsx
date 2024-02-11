@@ -15,7 +15,6 @@ import {
     BiTrash
 } from "react-icons/bi";
 import Popup from "reactjs-popup";
-import useStore from "../../store/store.js";
 import {toast} from "react-toastify";
 import Select from "react-select";
 
@@ -451,6 +450,8 @@ const Task = () => {
                                                                             }
                                                                         </div>
                                                                     )}
+
+                                                                    <div>{task.formattedDate}</div>
 
                                                                 </div>
                                                             </div>

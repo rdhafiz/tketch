@@ -85,6 +85,12 @@ const get = async (req, res) => {
                     },
                     'creator_objectId': {
                         $toObjectId: "$creator_id"
+                    },
+                    formattedDate: {
+                        $dateToString: {
+                            format: "%d-%m-%Y", // specify the desired format
+                            date: "$due_at" // specify the field containing the date
+                        }
                     }
                 }
             },

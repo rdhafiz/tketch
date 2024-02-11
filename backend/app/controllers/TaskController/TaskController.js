@@ -14,6 +14,7 @@ const manageState = require('./service/manageState');
 const updatePriority = require('./service/updatePriority');
 const addAttachment = require('./service/addAttachment');
 const deleteAttachment = require('./service/deleteAttachment');
+const dueDate = require('./service/dueDate');
 const taskController = {
     /**
      * @desc create function called by route to create task
@@ -158,6 +159,15 @@ const taskController = {
      */
     deleteAttachment: async (req, res) => {
         await deleteAttachment(req, res);
+    },
+    /**
+     * @desc dueDate function called by route to update dueDate
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    dueDate: async (req, res) => {
+        await dueDate(req, res);
     },
 }
 

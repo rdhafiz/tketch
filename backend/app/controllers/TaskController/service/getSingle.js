@@ -33,6 +33,12 @@ const getSingle = async (req, res) => {
                     'state_objectId': {
                         $toObjectId: "$state_id"
                     },
+                    formattedDate: {
+                        $dateToString: {
+                            format: "%Y-%m-%d", // specify the desired format
+                            date: "$due_at" // specify the field containing the date
+                        }
+                    }
                 },
             },
             {

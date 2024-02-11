@@ -345,6 +345,21 @@ const TaskSingle = () => {
             }
         })
     }
+    const updateDueDate = (event) => {
+        let date = event.target.value;
+        if (!date) {
+            date = null
+        }
+        console.log(date)
+        ApiService.PATCH(ApiRoutes.task + '/' + taskId + '/due/date', {date}, (res) => {
+            if (res.status === 'ok') {
+                setTask((prevState => ({
+                    ...prevState,
+                    due_at: res.due_at,
+                })))
+            }
+        })
+    }
     return (
         <>
             {project != null && (
@@ -1057,6 +1072,15 @@ const TaskSingle = () => {
                             </div>
                             <div className={`border-b-[1px] mb-5`}>
                                 <div className={`flex items-center justify-between mb-2`}>
+                                    <div className={`text-[16px] font-medium text-teal-900`}>Due date</div>
+                                    <div></div>
+                                </div>
+                                <div className={`flex items-center mb-4`}>
+                                    <input type="date" className={`input`} defaultValue={task.formattedDate} pattern="\d{2}/\d{2}/\d{4}"  onChange={(event) => updateDueDate(event)}/>
+                                </div>
+                            </div>
+                            <div className={`mb-5`}>
+                                <div className={`flex items-center justify-between mb-2`}>
                                     <div className={`text-[16px] font-medium text-teal-900`}>Attachments</div>
                                     <div>
                                         <Popup ref={popupRef} nested trigger={<span><i className={`cursor-pointer text-gray-400 text-2xl`}><BiSolidCog /></i></span>}
@@ -1134,12 +1158,11 @@ const TaskSingle = () => {
 
                                         }
                                     </>
-
-                                    // <div className={`capitalize border font-bold p-2 w-max rounded-md text-[12px] flex items-center mb-4`}>{task.state.name}</div>
                                 ) : (
                                     <div className={`text-gray-500 mb-4`}>No attachment found</div>
                                 )}
                             </div>
+
                         </div>
 
                     </div>
