@@ -23,6 +23,7 @@ const TaskSingle = () => {
         name: false,
         description: false,
         comment: false,
+        commentEdit: false,
     });
     const [loading, setLoading] = useState({
         name: false,
@@ -44,7 +45,53 @@ const TaskSingle = () => {
     const [labelData, setLabelData] = useState({});
     const [states, setStates] = useState([]);
     const [stateData, setStateData] = useState({});
+    const [commentEditData, setCommentEditData] = useState(null);
+    const editorConfig = {
+        height: '300',
+        plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+        toolbar: 'undo redo | blocks fontfamily fontsize | ' +
+            'bold italic underline strikethrough | link image media table | align lineheight | ' +
+            'numlist bullist indent outdent | emoticons charmap | removeformat',
+        menubar: false,
+        paste_data_images: true,
+        file_picker_types: 'image',
+        image_title: false,
+        image_description: false,
+        image_dimensions: false,
+        image_uploadtab: false,
+        file_picker_callback: (cb, value, meta) => {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
 
+            input.addEventListener('change', (e) => {
+                // @ts-ignore
+                const file = e.target.files[0];
+
+                const reader = new FileReader();
+                reader.addEventListener('load', () => {
+                    /*
+                      Note: Now we need to register the blob in TinyMCEs image blob
+                      registry. In the next release this part hopefully won't be
+                      necessary, as we are looking to handle it internally.
+                    */
+                    const id = 'blobid' + (new Date()).getTime();
+                    const blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                    // @ts-ignore
+                    const base64 = reader.result.split(',')[1];
+                    const blobInfo = blobCache.create(id, file, base64);
+                    blobCache.add(blobInfo);
+
+                    /* call the callback and populate the Title field with the file name */
+                    cb(blobInfo.blobUri());
+                });
+                reader.readAsDataURL(file);
+            });
+
+            input.click();
+        },
+    }
+    const editorKey = '5okkk6pa2e28eipboxtb3q4hpofm9drb2hm8i9jqydhlhrwh'
     useEffect(() => {
         getProject()
         getTask()
@@ -206,8 +253,30 @@ const TaskSingle = () => {
         ApiService.PATCH(ApiRoutes.task + '/' + taskId + '/comment', {comment: comment}, (res) => {
             setLoading((prevState => ({...prevState, comment: false})))
             if (res.status === 'ok') {
-                // setTask((prevState => ({...prevState, comments: [...task.comments, comment]})))
+                setTask((prevState => ({...prevState, comments: res.comments})))
                 setEdit((prevState => ({...prevState, comment: false})))
+            }
+        })
+    }
+    const handleCommentEdit = (e) => {
+        e.preventDefault()
+        setLoading((prevState => ({...prevState, comment: true})))
+        ApiService.PATCH(ApiRoutes.task + '/' + taskId + '/comment/' + commentEditData._id, {comment: commentEditData.comment}, (res) => {
+            setLoading((prevState => ({...prevState, comment: false})))
+            if (res.status === 'ok') {
+                setTask((prevState => ({...prevState, comments: res.comments})))
+                setEdit((prevState => ({...prevState, commentEdit: false})))
+                setCommentEditData(null)
+            }
+        })
+    }
+    const deleteComment = (commentId) => {
+        setLoading((prevState => ({...prevState, comment: true})))
+        ApiService.DELETE(ApiRoutes.task + '/' + taskId + '/comment/' + commentId, (res) => {
+            setLoading((prevState => ({...prevState, comment: false})))
+            if (res.status === 'ok') {
+                setTask((prevState => ({...prevState, comments: res.comments})))
+                popupRef.current.close()
             }
         })
     }
@@ -450,7 +519,7 @@ const TaskSingle = () => {
                                     <form onSubmit={handleDescription}>
                                         <div className={`form-input`}>
                                             <Editor
-                                                apiKey='5okkk6pa2e28eipboxtb3q4hpofm9drb2hm8i9jqydhlhrwh'
+                                                apiKey={editorKey}
                                                 init={{
                                                     plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
                                                     toolbar: 'undo redo | blocks fontfamily fontsize | ' +
@@ -528,59 +597,18 @@ const TaskSingle = () => {
                                         <div className={`form-input`}>
                                             <input type="hidden" name={`comment`}/>
                                             <Editor
-                                                apiKey='5okkk6pa2e28eipboxtb3q4hpofm9drb2hm8i9jqydhlhrwh'
-                                                init={{
-                                                    height: '300',
-                                                    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-                                                    toolbar: 'undo redo | blocks fontfamily fontsize | ' +
-                                                        'bold italic underline strikethrough | link image media table | align lineheight | ' +
-                                                        'numlist bullist indent outdent | emoticons charmap | removeformat',
-                                                    menubar: false,
-                                                    paste_data_images: true,
-                                                    file_picker_types: 'image',
-                                                    image_title: false,
-                                                    image_description: false,
-                                                    image_dimensions: false,
-                                                    image_uploadtab: false,
-                                                    file_picker_callback: (cb, value, meta) => {
-                                                        const input = document.createElement('input');
-                                                        input.setAttribute('type', 'file');
-                                                        input.setAttribute('accept', 'image/*');
-
-                                                        input.addEventListener('change', (e) => {
-                                                            // @ts-ignore
-                                                            const file = e.target.files[0];
-
-                                                            const reader = new FileReader();
-                                                            reader.addEventListener('load', () => {
-                                                                /*
-                                                                  Note: Now we need to register the blob in TinyMCEs image blob
-                                                                  registry. In the next release this part hopefully won't be
-                                                                  necessary, as we are looking to handle it internally.
-                                                                */
-                                                                const id = 'blobid' + (new Date()).getTime();
-                                                                const blobCache = tinymce.activeEditor.editorUpload.blobCache;
-                                                                // @ts-ignore
-                                                                const base64 = reader.result.split(',')[1];
-                                                                const blobInfo = blobCache.create(id, file, base64);
-                                                                blobCache.add(blobInfo);
-
-                                                                /* call the callback and populate the Title field with the file name */
-                                                                cb(blobInfo.blobUri());
-                                                            });
-                                                            reader.readAsDataURL(file);
-                                                        });
-
-                                                        input.click();
-                                                    },
-                                                }}
+                                                apiKey={editorKey}
+                                                init={editorConfig}
                                                 initialValue={''}
                                                 onEditorChange={(content) => setComment(content)}
                                             />
                                             <small className="text-red-500 text-sm invalid-feedback"></small>
                                         </div>
                                         <div className="flex items-center justify-end pt-3 mb-6">
-                                            <button type={`button`} onClick={() => setEdit((prevState => ({...prevState, comment: false})))}
+                                            <button type={`button`} onClick={() => {
+                                                setEdit((prevState => ({...prevState, comment: false})))
+                                                setComment('')
+                                            }}
                                                     className="btn-white mr-3">Cancel</button>
                                             <button type={`submit`} className={`btn-black !w-[100px] ${loading.comment ? 'btn-loading' : ''}`}>
                                                 Save
@@ -594,11 +622,11 @@ const TaskSingle = () => {
                                 )}
 
                             </div>
-                            {/*{task.comments.length > 0 && (
+                            {task.comments.length > 0 && (
                                 <>
                                     {task.comments.map(comment => {
                                         return (
-                                            <div className="flex items-start space-x-4 mb-8">
+                                            <div className="flex items-start space-x-4 mb-5" key={comment._id}>
                                                 {comment?.user_details?.avatarFullPath ? (
                                                     <span className="block h-9 w-9 flex-shrink-0 rounded-full">
                                                         <img className={`rounded-full`} src={comment?.user_details?.avatarFullPath} alt=""/>
@@ -611,15 +639,70 @@ const TaskSingle = () => {
                                                 <div className="space-y-1">
                                                     <h4 className="font-semibold">
                                                         {comment?.user_details?.name}
-                                                        <time className="ms-5 text-sm font-medium" >2 hours ago</time>
+                                                        <time className="ms-5 text-sm font-medium" >{comment.comment_time}</time>
                                                     </h4>
-                                                    <div dangerouslySetInnerHTML={{__html: comment.comment}}></div>
+                                                    {
+                                                        edit.commentEdit && comment._id == commentEditData._id ? (
+                                                                <form onSubmit={handleCommentEdit} className={`w-full`}>
+                                                                    <div className={`form-input`}>
+                                                                        <input type="hidden" name={`comment`}/>
+                                                                        <Editor
+                                                                            apiKey={editorKey}
+                                                                            init={editorConfig}
+                                                                            initialValue={comment.comment}
+                                                                            onEditorChange={(content) => setCommentEditData((prevState) =>({
+                                                                                ...prevState, comment: content,
+                                                                            }))}
+                                                                        />
+                                                                        <small className="text-red-500 text-sm invalid-feedback"></small>
+                                                                    </div>
+                                                                    <div className="flex items-center justify-end pt-3 mb-6">
+                                                                        <button type={`button`} onClick={() => {
+                                                                            setEdit((prevState => ({...prevState, commentEdit: false})))
+                                                                            setCommentEditData(null)
+                                                                        }} className="btn-white mr-3">Cancel</button>
+                                                                        <button type={`submit`} className={`btn-black !w-[100px] ${loading.comment ? 'btn-loading' : ''}`}>
+                                                                            Save
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
+                                                        ) : (
+                                                            <div dangerouslySetInnerHTML={{__html: comment.comment}}></div>
+                                                        )
+                                                    }
+
+                                                    {user._id == comment.user_id && !edit.commentEdit && (
+                                                        <div>
+                                                            <button className={`text-sm font-medium text-gray-500 me-2 mt-3`} onClick={() => {
+                                                                setEdit((prevState) =>({...prevState, commentEdit: true}));
+                                                                setCommentEditData(comment)
+                                                            }}>Edit</button>
+                                                            <Popup offsetX={0} ref={popupRef} trigger={  <button className={`text-sm font-medium text-gray-500 !py-1`}>Delete
+                                                            </button>} position={["bottom right"]}>
+                                                                {close => (
+                                                                    <div className={`px-2 py-2`}>
+                                                                        <div className={`mb-4 text-sm text-red-500`}>Do you want to delete
+                                                                            this comment?
+                                                                        </div>
+                                                                        <div className={`flex justify-end items-center`}>
+                                                                            <button
+                                                                                className={`btn-white btn-sm me-2 min-w-12 justify-center`}
+                                                                                onClick={close}>No
+                                                                            </button>
+                                                                            <button className={`btn-black btn-sm max-w-12 ${loading.comment ? 'btn-loading' : ''}`} onClick={() => deleteComment(comment._id)}>Yes</button>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </Popup>
+
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         )
                                     })}
                                 </>
-                            )}*/}
+                            )}
                         </div>
                     </div>
                     <div id={`info-section`} className={`w-1/3 `}>
@@ -1076,7 +1159,7 @@ const TaskSingle = () => {
                                     <div></div>
                                 </div>
                                 <div className={`flex items-center mb-4`}>
-                                    <input type="date" className={`input`} defaultValue={task.formattedDate} pattern="\d{2}/\d{2}/\d{4}"  onChange={(event) => updateDueDate(event)}/>
+                                    <input type="date" className={`input`} defaultValue={task.formattedDate}  onChange={(event) => updateDueDate(event)}/>
                                 </div>
                             </div>
                             <div className={`mb-5`}>

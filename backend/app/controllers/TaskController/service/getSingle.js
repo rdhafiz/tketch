@@ -38,9 +38,24 @@ const getSingle = async (req, res) => {
                             format: "%Y-%m-%d", // specify the desired format
                             date: "$due_at" // specify the field containing the date
                         }
-                    }
+                    },
+                    'attachment': {
+                        $map: {
+                            input: '$attachment',
+                            as: 'file',
+                            in: {
+                                $mergeObjects: [
+                                    '$$file',
+                                    {
+                                        fileFullPath: { $concat: [process.env.APP_URL, '/uploads/', '$$file.file_path'] }
+                                    }
+                                ]
+                            }
+                        }
+                    },
                 },
             },
+
             {
                 $lookup: {
                     from: "users",
@@ -147,22 +162,137 @@ const getSingle = async (req, res) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
+            { $unwind: "$comments" },
             {
                 $addFields: {
-                    'attachment': {
-                        $map: {
-                            input: '$attachment',
-                            as: 'file',
+                    "comments.user_id": { $toObjectId: "$comments.user_id" }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "comments.user_id",
+                    foreignField: "_id",
+                    pipeline: [
+                        {
+                            $addFields: {
+                                'avatarFullPath': {
+                                    $cond: {
+                                        if: {$ne: ['$avatar', null]},
+                                        then: {$concat: [process.env.APP_URL, '/uploads/', '$avatar']},
+                                        else: null
+                                    }
+                                },
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                avatar: 1,
+                                avatarFullPath: 1,
+                                color: 1,
+                            }
+                        }
+                    ],
+                    as: "comments.user_details"
+                }
+            },
+            {
+                $unwind: "$comments.user_details" // Unwind the array into separate documents
+            },
+            {
+                $addFields: {
+                    "comments.comment_time": {
+                        $let: {
+                            vars: {
+                                currentTime: new Date(),
+                                commentTime: "$comments.created_at"
+                            },
                             in: {
-                                $mergeObjects: [
-                                    '$$file',
+                                $concat: [
                                     {
-                                        fileFullPath: { $concat: [process.env.APP_URL, '/uploads/', '$$file.file_path'] }
+                                        $cond: {
+                                            if: { $gte: [{ $subtract: ["$$currentTime", "$$commentTime"] }, 31536000000] }, // 1 year in milliseconds
+                                            then: {
+                                                $concat: [
+                                                    { $toString: { $floor: { $divide: [{ $subtract: ["$$currentTime", "$$commentTime"] }, 31536000000] } } },
+                                                    " years ago"
+                                                ]
+                                            },
+                                            else: {
+                                                $cond: {
+                                                    if: { $gte: [{ $subtract: ["$$currentTime", "$$commentTime"] }, 2592000000] }, // 1 month in milliseconds
+                                                    then: {
+                                                        $concat: [
+                                                            { $toString: { $floor: { $divide: [{ $subtract: ["$$currentTime", "$$commentTime"] }, 2592000000] } } },
+                                                            " months ago"
+                                                        ]
+                                                    },
+                                                    else: {
+                                                        $cond: {
+                                                            if: { $gte: [{ $subtract: ["$$currentTime", "$$commentTime"] }, 86400000] }, // 1 day in milliseconds
+                                                            then: {
+                                                                $concat: [
+                                                                    { $toString: { $floor: { $divide: [{ $subtract: ["$$currentTime", "$$commentTime"] }, 86400000] } } },
+                                                                    " days ago"
+                                                                ]
+                                                            },
+                                                            else: {
+                                                                $cond: {
+                                                                    if: { $gte: [{ $subtract: ["$$currentTime", "$$commentTime"] }, 3600000] }, // 1 hour in milliseconds
+                                                                    then: {
+                                                                        $concat: [
+                                                                            { $toString: { $floor: { $divide: [{ $subtract: ["$$currentTime", "$$commentTime"] }, 3600000] } } },
+                                                                            " hours ago"
+                                                                        ]
+                                                                    },
+                                                                    else: {
+                                                                        $concat: [
+                                                                            { $toString: { $floor: { $divide: [{ $subtract: ["$$currentTime", "$$commentTime"] }, 60000] } } },
+                                                                            " minutes ago"
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 ]
                             }
                         }
                     }
+                }
+            },
+            {
+                $unwind: "$comments"
+            },
+            {
+                $sort: { "comments._id": -1 }
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    assignee: { $first: "$assignee" },
+                    assignee_as_objectId: { $first: "$assignee_as_objectId" },
+                    attachment: { $first: "$attachment" },
+                    label: { $first: "$label" },
+                    label_as_objectId: { $first: "$label_as_objectId" },
+                    label_id: { $first: "$label_id" },
+                    members: { $first: "$members" },
+                    name: { $first: "$name" },
+                    description: { $first: "$description" },
+                    priority: { $first: "$priority" },
+                    project_id: { $first: "$project_id" },
+                    reporter: { $first: "$reporter" },
+                    state: { $first: "$state" },
+                    state_id: { $first: "$state_id" },
+                    state_objectId: { $first: "$state_objectId" },
+                    status: { $first: "$status" },
+                    comments: { $push: "$comments" }
                 }
             },
         ]).exec();

@@ -4,7 +4,7 @@ const Validator = require("../../../helpers/validator");
 const HandleUpload = require("../../../helpers/handleUpload");
 const fs = require("fs-extra");
 const path = require("path");
-const mongoose = require("mongoose");
+const getAttachment = require("./getAttachment")
 const addAttachment = async (req, res) => {
     try {
         const {sessionUser} = req
@@ -38,29 +38,7 @@ const addAttachment = async (req, res) => {
         }
         const task = await TaskModel.updateOne({_id: id}, {$push: {attachment: attachmentData}}).exec()
         if (task.modifiedCount > 0) {
-            const attachments = await TaskModel.aggregate([
-                {
-                    $match: { _id: new mongoose.Types.ObjectId(id) }
-                },
-                {
-                    $project: {
-                        attachment: {
-                            $map: {
-                                input: "$attachment",
-                                as: 'file',
-                                in: {
-                                    $mergeObjects: [
-                                        '$$file',
-                                        {
-                                            fileFullPath: { $concat: [process.env.APP_URL, '/uploads/', '$$file.file_path'] }
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                },
-            ]).exec();
+            const attachments = await getAttachment(id)
             // Returning a 200 OK response with message
             return res.status(200).json({message: 'Task attachment has been created successfully', attachments: attachments[0].attachment, status: 'ok'});
         }

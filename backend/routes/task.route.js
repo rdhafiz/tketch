@@ -11,6 +11,8 @@ router.patch("/:id", TaskController.update);
 router.patch("/:id/name", TaskController.nameUpdate);
 router.patch("/:id/desc", TaskController.descUpdate);
 router.patch("/:id/comment", TaskController.addComment);
+router.patch("/:id/comment/:commentId", TaskController.updateComment);
+router.delete("/:id/comment/:commentId", TaskController.deleteComment);
 router.patch("/:id/manage/assignee", TaskController.manageAssignee);
 router.patch("/:id/manage/label", TaskController.manageLabel);
 router.patch("/:id/manage/state", TaskController.manageState);

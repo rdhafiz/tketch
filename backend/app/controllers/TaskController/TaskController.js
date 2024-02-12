@@ -8,6 +8,8 @@ const getStatus = require('./service/getStatus');
 const nameUpdate = require('./service/nameUpdate');
 const descUpdate = require('./service/descUpdate');
 const addComment = require('./service/addComment');
+const updateComment = require('./service/updateComment');
+const deleteComment = require('./service/deleteComment');
 const manageAssignee = require('./service/manageAssignee');
 const manageLabel = require('./service/manageLabel');
 const manageState = require('./service/manageState');
@@ -114,6 +116,24 @@ const taskController = {
      */
     addComment: async (req, res) => {
         await addComment(req, res);
+    },
+    /**
+     * @desc updateComment function called by route to update comment
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    updateComment: async (req, res) => {
+        await updateComment(req, res);
+    },
+    /**
+     * @desc deleteComment function called by route to delete comment
+     * @param {Object} req - request object
+     * @param {Object} res - response object
+     * @access - private
+     */
+    deleteComment: async (req, res) => {
+        await deleteComment(req, res);
     },
     /**
      * @desc manageAssignee function called by route to update assignee

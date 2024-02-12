@@ -388,7 +388,7 @@ const Task = () => {
                                                                         <div className={`flex items-center me-16 flex-wrap`}>
                                                                             {task.label.map(l => {
                                                                                 return (
-                                                                                    <>
+                                                                                    <div key={l._id}>
                                                                                         {l.description ? (
                                                                                             <Popup className={`w-auto`} key={l._id}
                                                                                                    trigger={open => (
@@ -405,7 +405,7 @@ const Task = () => {
                                                                                         ) : (
                                                                                             <div key={l._id} style={{backgroundColor: l.color}} className={`p-1 mb-1 leading-3 rounded-full font-bold text-white me-2 text-[11px]`}>{l.name}</div>
                                                                                         )}
-                                                                                    </>
+                                                                                    </div>
                                                                                 )
                                                                             })}
                                                                         </div>

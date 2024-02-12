@@ -2,10 +2,9 @@ const TaskModel = require("../../../model/Task");
 const Joi = require("joi");
 const Validator = require("../../../helpers/validator");
 const getComments = require("./getComments");
-const addComment = async (req, res) => {
+const updateComment = async (req, res) => {
     try {
-        const { sessionUser } = req
-        const {id} = req.params
+        const {id, commentId} = req.params
         const {comment} = req.body
         // Defining the schema for request body validation using "Joi"
         const schema = Joi.object({
@@ -17,11 +16,11 @@ const addComment = async (req, res) => {
         if (validator.error !== undefined) {
             return res.status(400).json(Validator.parseError(validator.error));
         }
-        let commentData = {
-            user_id: sessionUser._id,
-            comment: comment,
-        }
-        const task = await TaskModel.updateOne({_id: id}, {$push: {comments: commentData}}).exec()
+
+        const task = await TaskModel.updateOne(
+            { _id: id, "comments._id": commentId },
+            { $set: { "comments.$[comment].comment": comment } },
+            { arrayFilters: [{ "comment._id": commentId }] }).exec()
         if (task.modifiedCount > 0) {
             const comments = await getComments(id)
             // Returning a 200 OK response with message
@@ -32,4 +31,4 @@ const addComment = async (req, res) => {
         res.status(500).send(error.message);
     }
 }
-module.exports = addComment
+module.exports = updateComment
