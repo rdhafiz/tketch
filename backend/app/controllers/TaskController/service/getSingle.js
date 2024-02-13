@@ -162,7 +162,15 @@ const getSingle = async (req, res) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
-            { $unwind: "$comments" },
+            {
+                $unwind: {
+                    path: '$comments',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $sort: { "comments._id": -1 }
+            },
             {
                 $addFields: {
                     "comments.user_id": { $toObjectId: "$comments.user_id" }
@@ -199,7 +207,10 @@ const getSingle = async (req, res) => {
                 }
             },
             {
-                $unwind: "$comments.user_details" // Unwind the array into separate documents
+                $unwind: {
+                    path: '$comments.user_details',
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $addFields: {
@@ -268,12 +279,6 @@ const getSingle = async (req, res) => {
                 }
             },
             {
-                $unwind: "$comments"
-            },
-            {
-                $sort: { "comments._id": -1 }
-            },
-            {
                 $group: {
                     _id: "$_id",
                     assignee: { $first: "$assignee" },
@@ -292,9 +297,48 @@ const getSingle = async (req, res) => {
                     state_id: { $first: "$state_id" },
                     state_objectId: { $first: "$state_objectId" },
                     status: { $first: "$status" },
-                    comments: { $push: "$comments" }
+                    comments: {
+                        $push: {
+                            $cond: {
+                                if: { $ne: ["$comments.user_details", null] },
+                                then: {
+                                    user_details: "$comments.user_details",
+                                    // Add other fields from comments if needed
+                                },
+                                else: "$$REMOVE"
+                            }
+                        }
+                    }
                 }
             },
+            {
+                $project: {
+                    _id: 1,
+                    assignee: 1,
+                    assignee_as_objectId: 1,
+                    attachment: 1,
+                    label: 1,
+                    label_as_objectId: 1,
+                    label_id: 1,
+                    members: 1,
+                    name: 1,
+                    description: 1,
+                    priority: 1,
+                    project_id: 1,
+                    reporter: 1,
+                    state: 1,
+                    state_id: 1,
+                    state_objectId: 1,
+                    status: 1,
+                    comments: {
+                        $filter: {
+                            input: "$comments",
+                            as: "comment",
+                            cond: { $ne: ["$$comment", {}] }
+                        }
+                    }
+                }
+            }
         ]).exec();
         if (task.length > 0) {
             // Returning a 200 OK response with project data
