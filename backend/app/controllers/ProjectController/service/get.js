@@ -28,7 +28,7 @@ const get = async (req, res) => {
                 result.project = project;
             }
         } else {
-            const currentUserId = req.sessionUser['_id'].toString(); // Replace with the actual current user's ID
+            const currentUserId = req.sessionUser['_id'].toString();
 
             let matchCondition = {
                 deleted_at: {$eq: null},

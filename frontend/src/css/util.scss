@@ -29,6 +29,9 @@
 .input {
   @apply w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2;
 }
+.input-no-border {
+  @apply w-full rounded-md border-0 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2;
+}
 
 /*form related start*/
 
@@ -46,4 +49,29 @@
   &.info {
     @apply bg-cyan-500;
   }
+}
+
+[role=tooltip].popup-content {
+  width: auto!important;
+}
+
+/*scroll bar*/
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: rgb(243 244 246 / 1);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(215, 216, 217);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(191, 192, 192);
 }

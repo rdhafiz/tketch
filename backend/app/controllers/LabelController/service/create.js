@@ -12,8 +12,7 @@ const create = async (req, res) => {
             name: Joi.string().required(),
             project_id: Joi.string().required(),
             color: Joi.string().required(),
-            description: Joi.string().allow(null),
-        }).options({abortEarly: false});
+        }).options({abortEarly: false, allowUnknown: true});
         // Validating the request body against the defined schema
         const validator = await schema.validate(req.body);
         // If validation fails, return a 400 Bad Request response with validation errors

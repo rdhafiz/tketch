@@ -18,9 +18,9 @@ const fileUpload = require('express-fileupload');
 app.use(fileUpload());
 
 // Parsing incoming requests with URL-encoded payloads
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({limit: "50mb", extended: true }));
 // Parsing incoming requests with JSON payloads
-app.use(express.json());
+app.use(express.json({limit: "50mb"}));
 
 
 // Importing the 'router' module from the 'route.js' file located in the 'routes' folder

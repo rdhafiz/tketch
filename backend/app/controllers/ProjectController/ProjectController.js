@@ -3,8 +3,8 @@ const update = require('./service/update');
 const get = require('./service/get');
 const deleteProject = require('./service/delete');
 const updateStatus = require('./service/updateStatus');
-const addMember = require('./service/addMember');
-const removeMember = require('./service/removeMember');
+const getSingle = require('./service/getSingle');
+const getStatus = require('./service/getStatus');
 const projectController = {
     /**
      * @desc create function called by route to create project
@@ -40,7 +40,7 @@ const projectController = {
      * @access - private
      */
     delete: async (req, res) => {
-        await deleteProject(req, res);
+            await deleteProject(req, res);
     },
     /**
      * @desc updateStatus function called by route to update status of a project
@@ -52,22 +52,22 @@ const projectController = {
         await updateStatus(req, res);
     },
     /**
-     * @desc addMember function called by route to add members to a project
+     * @desc get single function called by route to get single a project
      * @param {Object} req - request object
      * @param {Object} res - response object
      * @access - private
      */
-    addMember: async (req, res) => {
-        await addMember(req, res);
+    getSingle: async (req, res) => {
+        await getSingle(req, res);
     },
     /**
-     * @desc removeMember function called by route to remove members from a project
+     * @desc getStatus function called by route to get status of project
      * @param {Object} req - request object
      * @param {Object} res - response object
      * @access - private
      */
-    removeMember: async (req, res) => {
-        await removeMember(req, res);
+    getStatus: async (req, res) => {
+        await getStatus(req, res);
     },
 }
 

@@ -1,6 +1,6 @@
 const ProjectModel = require("../../../model/Project");
 const {projectStatus} = require("../../../constants/projectStatus");
-const deleteLabel = async (req, res) => {
+const updateStatus = async (req, res) => {
     try {
         const {id} = req.params
         const project = await ProjectModel.findById(id);
@@ -14,4 +14,4 @@ const deleteLabel = async (req, res) => {
         res.status(500).send(error.message);
     }
 }
-module.exports = deleteLabel
+module.exports = updateStatus
